@@ -496,7 +496,18 @@ const getCommandsMap: (
       vscode.commands.executeCommand("workbench.action.copyEditorToNewWindow");
       vscode.commands.executeCommand("workbench.action.closeAuxiliaryBar");
     },
-    "skax.openConfigPage": () => {
+    "skax.openConfigPage": async () => {
+      const configResult = await configHandler.loadConfig();
+      const config = configResult.config;
+
+      // Access custom values
+      const modelsByRole = config.modelsByRole; // ← Changed from name to models
+
+      // Access userToken from users-setting.json
+      const userToken = config.userToken; // This should be "abc123_my_secret_token"
+
+      console.log("🔍 modelsByRole:", modelsByRole);
+      console.log("�� UserToken from users-setting.json:", userToken);
       vscode.commands.executeCommand("skax.navigateTo", "/config", false);
     },
     "skax.selectFilesAsContext": async (

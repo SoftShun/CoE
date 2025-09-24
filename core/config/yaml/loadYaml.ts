@@ -12,7 +12,9 @@ import {
   unrollAssistant,
   validateConfigYaml,
 } from "@continuedev/config-yaml";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
+import { readFileSync, existsSync } from "node:fs";
+import { getContinueGlobalPath } from "../../util/paths";
 
 import {
   ContinueConfig,
@@ -46,6 +48,28 @@ import {
   convertYamlRuleToContinueRule,
 } from "./yamlToContinueConfig";
 
+interface UserSettings {
+  userToken: string;
+}
+
+function loadUserSettings(): UserSettings {
+  const userSettingsPath = join(getContinueGlobalPath(), "users-setting.json");
+  
+  if (!existsSync(userSettingsPath)) {
+    console.warn("users-setting.json not found in ~/.continue, using empty userToken");
+    return { userToken: "" };
+  }
+  
+  try {
+    const userSettingsContent = readFileSync(userSettingsPath, "utf-8");
+    const userSettings: UserSettings = JSON.parse(userSettingsContent);
+    return userSettings;
+  } catch (error) {
+    console.error("Error reading users-setting.json from ~/.continue:", error);
+    return { userToken: "" };
+  }
+}
+
 async function loadConfigYaml(options: {
   overrideConfigYaml: AssistantUnrolled | undefined;
   controlPlaneClient: ControlPlaneClient;
@@ -78,10 +102,6 @@ async function loadConfigYaml(options: {
   const localPackageIdentifiers: PackageIdentifier[] = (
     await Promise.all(localBlockPromises)
   ).flat();
-
-  // logger.info(
-  //   `Loading config.yaml from ${JSON.stringify(packageIdentifier)} with root path ${rootPath}`,
-  // );
 
   // Registry client is only used if local blocks are present, but logic same for hub/local assistants
   const getRegistryClient = async () => {
@@ -173,9 +193,15 @@ async function configYamlToContinueConfig(options: {
 }): Promise<{ config: ContinueConfig; errors: ConfigValidationError[] }> {
   let { config, ide, ideSettings, ideInfo, uniqueId, llmLogger } = options;
 
+  console.log("🔍 configYamlToContinueConfig: userToken from ideSettings:", ideSettings.userToken);
+
   const localErrors: ConfigValidationError[] = [];
+  
+  // Extract custom settings from config.yaml
+
 
   const continueConfig: ContinueConfig = {
+
     slashCommands: [],
     tools: await getToolsForIde(ide),
     mcpServerStatuses: [],
@@ -199,7 +225,13 @@ async function configYamlToContinueConfig(options: {
       summarize: null,
     },
     rules: [],
+    userToken: ideSettings.userToken, // Add userToken to continueConfig
+    // Add custom values directly to continueConfig
+
   };
+
+  console.log("🔍 configYamlToContinueConfig: Final continueConfig.userToken:", continueConfig.userToken);
+
 
   // Right now, if there are any missing packages in the config, then we will just throw an error
   if (!isAssistantUnrolledNonNullable(config)) {
@@ -306,6 +338,8 @@ async function configYamlToContinueConfig(options: {
         llmLogger,
         config: continueConfig,
       });
+
+      // Add to models array
 
       if (model.roles?.includes("chat")) {
         continueConfig.modelsByRole.chat.push(...llms);
@@ -459,11 +493,25 @@ export async function loadContinueConfigFromYaml(options: {
     packageIdentifier,
   } = options;
 
+  console.log("Original ideSettings.userToken:", ideSettings.userToken);
+  
+  // Load user settings from users-setting.json
+  const userSettings = loadUserSettings();
+  console.log("UserSettings from file:", userSettings);
+  
+  // Create modified ideSettings with userToken from users-setting.json
+  const modifiedIdeSettings: IdeSettings = {
+    ...ideSettings,
+    userToken: userSettings.userToken || ideSettings.userToken,
+  };
+  
+  console.log("Modified ideSettings.userToken:", modifiedIdeSettings.userToken);
+
   const configYamlResult = await loadConfigYaml({
     overrideConfigYaml,
     controlPlaneClient,
     orgScopeId,
-    ideSettings,
+    ideSettings: modifiedIdeSettings, // Use modified ideSettings
     ide,
     packageIdentifier,
   });
@@ -480,12 +528,14 @@ export async function loadContinueConfigFromYaml(options: {
     await configYamlToContinueConfig({
       config: configYamlResult.config,
       ide,
-      ideSettings,
+      ideSettings: modifiedIdeSettings, // Pass modified ideSettings
       ideInfo,
       uniqueId,
       llmLogger,
       workOsAccessToken,
     });
+
+  console.log("🔍 loadContinueConfigFromYaml: Applying shared config...");
 
   // Apply shared config
   // TODO: override several of these values with user/org shared config

@@ -747,6 +747,8 @@
     "@continuedev/fetch": "file:../../packages/fetch",
     "@electron/rebuild": "^3.2.10",
     "@reduxjs/toolkit": "^1.9.3",
+    "@sentry/core": "^9.43.0",
+    "@sentry/node": "^9.43.0",
     "@vscode/ripgrep": "^1.15.9",
     "axios": "^1.2.5",
     "core": "file:../../core",
