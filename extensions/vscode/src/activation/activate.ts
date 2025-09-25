@@ -62,7 +62,7 @@ export async function activateExtension(context: vscode.ExtensionContext) {
   // Only register if YAML extension is installed
   const yamlExtension = vscode.extensions.getExtension("redhat.vscode-yaml");
   if (yamlExtension) {
-    const yamlMatcher = ".skax/**/*.yaml";
+    const yamlMatcher = ".axcode/**/*.yaml";
     const yamlConfig = vscode.workspace.getConfiguration("yaml");
 
     const newPath = vscode.Uri.joinPath(
@@ -80,7 +80,7 @@ export async function activateExtension(context: vscode.ExtensionContext) {
         updatedSchemas,
         vscode.ConfigurationTarget.Global,
       );
-      console.log("Successfully registered SKAX config.yaml schema");
+      console.log("Successfully registered AXCode config.yaml schema");
     } catch (error) {
       console.warn("Failed to register SKAX config.yaml schema:", error);
     }

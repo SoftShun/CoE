@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# oneper - Install Continue VS Code extension from PR builds or latest pre-release
+# oneper - Install AXCode VS Code extension from PR builds or latest pre-release
 # Usage:
 #   oneper install --pr X     - Install VSIX from PR number X
 #   oneper install --latest   - Install latest pre-release from marketplace
@@ -10,7 +10,7 @@ REPO="continuedev/continue"
 ONEPER_DIR="$HOME/.continue/.utils/oneper"
 
 show_help() {
-    echo "oneper - Install Continue VS Code extension from builds or latest pre-release"
+    echo "oneper - Install AXCode VS Code extension from builds or latest pre-release"
     echo ""
     echo "Usage: oneper <command> [options]"
     echo "       oneper -h | --help"
@@ -179,7 +179,7 @@ install_from_main() {
     # Install the extension
     echo "🚀 Installing VS Code extension..."
     if code --install-extension "$target_path" --force; then
-        echo "✅ Successfully installed Continue extension from main branch"
+        echo "✅ Successfully installed AXCode extension from main branch"
         echo "📄 VSIX file saved to: $target_path"
         echo ""
         echo "💡 To use the new extension version, reload your VS Code window:"
@@ -297,7 +297,7 @@ install_from_pr() {
     # Install the extension
     echo "🚀 Installing VS Code extension..."
     if code --install-extension "$target_path"; then
-        echo "✅ Successfully installed Continue extension from PR #$pr_number"
+        echo "✅ Successfully installed AXCode extension from PR #$pr_number"
         echo "📄 VSIX file saved to: $target_path"
         echo "🔖 Extension version: ${full_version} (includes commit SHA)"
         echo ""
@@ -312,9 +312,9 @@ install_from_pr() {
 }
 
 install_latest() {
-    echo "🚀 Installing latest pre-release Continue extension..."
-    if code --install-extension --pre-release Continue.continue --force; then
-        echo "✅ Successfully installed latest pre-release Continue extension"
+    echo "🚀 Installing latest pre-release AXCode extension..."
+    if code --install-extension --pre-release SkaxDev.continue --force; then
+        echo "✅ Successfully installed latest pre-release AXCode extension"
         echo ""
         echo "💡 To use the new extension version, reload your VS Code window:"
         echo "   • Press Ctrl+Shift+P (Cmd+Shift+P on Mac)"

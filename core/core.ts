@@ -1153,17 +1153,15 @@ export class Core {
         }
 
         if (
-          uri.endsWith(".continuerc.json") ||
+          uri.endsWith(".axcoderc.json") ||
           uri.endsWith(".prompt") ||
           uri.endsWith(SYSTEM_PROMPT_DOT_FILE) ||
-          (uri.includes(".continue") &&
+          (uri.includes(".axcode") &&
             (uri.endsWith(".yaml") || uri.endsWith("yml"))) ||
-          BLOCK_TYPES.some((blockType) =>
-            uri.includes(`.continue/${blockType}`),
-          )
+          BLOCK_TYPES.some((blockType) => uri.includes(`.axcode/${blockType}`))
         ) {
           await this.configHandler.reloadConfig(
-            "Config-related file updated: continuerc, prompt, local block, etc",
+            "Config-related file updated: axcoderc, prompt, local block, etc",
           );
         } else if (uri.endsWith(RULES_MARKDOWN_FILENAME)) {
           try {

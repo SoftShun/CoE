@@ -22,11 +22,9 @@ export function getNonce() {
 }
 
 export function getExtensionUri(): vscode.Uri {
-  const extension = vscode.extensions.getExtension(
-    "SkaxDev.skax-code-assistant",
-  );
+  const extension = vscode.extensions.getExtension("SkaxDev.axcode");
   if (!extension) {
-    throw new Error("SKAX Code Assistant extension not found");
+    throw new Error("AXCode Code Assistant extension not found");
   }
   if (!extension.extensionUri) {
     throw new Error("Extension URI not available");

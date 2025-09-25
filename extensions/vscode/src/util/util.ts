@@ -156,9 +156,7 @@ export function getMetaKeyName() {
 }
 
 export function getExtensionVersion(): string {
-  const extension = vscode.extensions.getExtension(
-    "SkaxDev.skax-code-assistant",
-  );
+  const extension = vscode.extensions.getExtension("SkaxDev.axcode");
   return extension?.packageJSON.version || "0.1.0";
 }
 

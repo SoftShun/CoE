@@ -1,9 +1,6 @@
 import {
-  ArrowTopRightOnSquareIcon,
   DocumentArrowUpIcon,
-  NumberedListIcon,
-  PaintBrushIcon,
-  TableCellsIcon,
+  PaintBrushIcon
 } from "@heroicons/react/24/outline";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,61 +35,6 @@ export function HelpCenterSection() {
     <div className="py-5">
       <h3 className="mb-4 mt-0 text-xl">Help center</h3>
       <div className="-mx-4 flex flex-col">
-        <MoreHelpRow
-          title="Continue Hub"
-          description="Visit hub.continue.dev to explore custom agents and blocks"
-          Icon={ArrowTopRightOnSquareIcon}
-          onClick={() =>
-            ideMessenger.post("openUrl", "https://hub.continue.dev/")
-          }
-        />
-
-        <MoreHelpRow
-          title="Documentation"
-          description="Learn how to configure and use Continue"
-          Icon={ArrowTopRightOnSquareIcon}
-          onClick={() =>
-            ideMessenger.post("openUrl", "https://docs.continue.dev/")
-          }
-        />
-
-        <MoreHelpRow
-          title="Have an issue?"
-          description="Let us know on GitHub and we'll do our best to resolve it"
-          Icon={ArrowTopRightOnSquareIcon}
-          onClick={() =>
-            ideMessenger.post(
-              "openUrl",
-              "https://github.com/continuedev/continue/issues/new/choose",
-            )
-          }
-        />
-
-        <MoreHelpRow
-          title="Join the community!"
-          description="Join us on Discord to stay up-to-date on the latest developments"
-          Icon={ArrowTopRightOnSquareIcon}
-          onClick={() =>
-            ideMessenger.post("openUrl", "https://discord.gg/vapESyrFmJ")
-          }
-        />
-
-        <MoreHelpRow
-          title="Token usage"
-          description="Daily token usage across models"
-          Icon={TableCellsIcon}
-          onClick={() => navigate("/stats")}
-        />
-
-        {currentSession.history.length > 0 && !currentSession.isStreaming && (
-          <MoreHelpRow
-            title="View current session history"
-            description="Open the current chat session file for troubleshooting"
-            Icon={NumberedListIcon}
-            onClick={handleViewSessionData}
-          />
-        )}
-
         <MoreHelpRow
           title="Quickstart"
           description="Reopen the quickstart and tutorial file"

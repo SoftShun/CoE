@@ -5,8 +5,8 @@ import svgBuilder from "svg-builder";
 import * as vscode from "vscode";
 import { getTheme } from "../util/getTheme";
 import {
-  HandlerPriority,
-  SelectionChangeManager,
+    HandlerPriority,
+    SelectionChangeManager,
 } from "./SelectionChangeManager";
 
 // Instead of getters that execute immediately, use methods or lazy properties
@@ -319,7 +319,7 @@ export class JumpManager {
     // Set the context key to enable tab/esc shortcuts.
     await vscode.commands.executeCommand(
       "setContext",
-      "skax.jumpDecorationVisible",
+      "axcode.jumpDecorationVisible",
       true,
     );
     this._jumpDecorationVisible = true;
@@ -340,7 +340,7 @@ export class JumpManager {
     // Reset the context.
     await vscode.commands.executeCommand(
       "setContext",
-      "skax.jumpDecorationVisible",
+      "axcode.jumpDecorationVisible",
       false,
     );
     this._jumpDecorationVisible = false;
@@ -351,7 +351,7 @@ export class JumpManager {
     jumpPosition: vscode.Position,
   ) {
     const acceptJumpCommand = vscode.commands.registerCommand(
-      "skax.acceptJump",
+      "axcode.acceptJump",
       async () => {
         if (this._jumpDecorationVisible) {
           this._jumpAccepted = true;
@@ -373,7 +373,7 @@ export class JumpManager {
     );
 
     const rejectJumpCommand = vscode.commands.registerCommand(
-      "skax.rejectJump",
+      "axcode.rejectJump",
       async () => {
         if (this._jumpDecorationVisible) {
           console.log(
@@ -405,7 +405,7 @@ export class JumpManager {
           this._oldCursorPosition &&
           !currentPosition.isEqual(this._oldCursorPosition)
         ) {
-          vscode.commands.executeCommand("skax.rejectJump");
+          vscode.commands.executeCommand("axcode.rejectJump");
         }
       });
 

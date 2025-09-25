@@ -19,7 +19,7 @@ class ContinueQuickFixProvider implements vscode.CodeActionProvider {
     const diagnostic = context.diagnostics[0];
 
     const quickFix = new vscode.CodeAction(
-      "Ask Continue",
+      "Ask AXCode",
       vscode.CodeActionKind.QuickFix,
     );
 
@@ -33,8 +33,8 @@ class ContinueQuickFixProvider implements vscode.CodeActionProvider {
     );
 
     quickFix.command = {
-      command: "skax.quickFix",
-      title: "Continue Quick Fix",
+      command: "axcode.quickFix",
+      title: "AXCode Quick Fix",
       arguments: [surroundingRange, diagnostic.message],
     };
 

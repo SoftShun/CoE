@@ -47,20 +47,20 @@ const statusBarItemText = (
   error?: boolean,
 ) => {
   if (error) {
-    return "$(alert) Continue (config error)";
+    return "$(alert) AXCode (config error)";
   }
 
   switch (status) {
     case undefined:
       if (loading) {
-        return "$(loading~spin) Continue";
+        return "$(loading~spin) AXCode";
       }
     case StatusBarStatus.Disabled:
-      return "$(circle-slash) Continue";
+      return "$(circle-slash) AXCode";
     case StatusBarStatus.Enabled:
-      return "$(check) Continue";
+      return "$(check) AXCode";
     case StatusBarStatus.Paused:
-      return "$(debug-pause) Continue";
+      return "$(debug-pause) AXCode";
   }
 };
 
@@ -123,7 +123,7 @@ export function setupStatusBar(
 
   statusBarItem.text = statusBarItemText(status, loading, statusBarError);
   statusBarItem.tooltip = statusBarItemTooltip(status ?? statusBarStatus);
-  statusBarItem.command = "skax.openTabAutocompleteConfigMenu";
+  statusBarItem.command = "axcode.openTabAutocompleteConfigMenu";
 
   statusBarItem.show();
   if (status !== undefined) {

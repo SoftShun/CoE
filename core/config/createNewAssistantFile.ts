@@ -5,7 +5,7 @@ const DEFAULT_ASSISTANT_FILE = `# This is an example assistant configuration fil
 # It is used to define custom AI assistants within Continue
 # Each assistant file can be accessed by selecting it from the assistant dropdown
 
-# To learn more, see the full assistant reference: https://docs.continue.dev/reference
+# To learn more, see the full assistant reference: 
 
 name: Example Assistant
 version: 1.0.0

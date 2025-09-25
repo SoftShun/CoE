@@ -3,8 +3,8 @@ import {
   ContextProviderDescription,
   ContextProviderExtras,
   ContextSubmenuItem,
-  LoadSubmenuItemsArgs,
   FetchFunction,
+  LoadSubmenuItemsArgs,
 } from "../../index.js";
 import { BaseContextProvider } from "../index.js";
 
