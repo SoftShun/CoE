@@ -2,7 +2,6 @@ import { IndexingProgressUpdate } from "core";
 import { usePostHog } from "posthog-js/react";
 import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-
 import ConfirmationDialog from "../../../components/dialogs/ConfirmationDialog";
 import { IdeMessengerContext } from "../../../context/IdeMessenger";
 import { useWebviewListener } from "../../../hooks/useWebviewListener";
@@ -13,7 +12,6 @@ import IndexingProgressErrorText from "./IndexingProgressErrorText";
 import IndexingProgressIndicator from "./IndexingProgressIndicator";
 import IndexingProgressSubtext from "./IndexingProgressSubtext";
 import IndexingProgressTitleText from "./IndexingProgressTitleText";
-
 export function getProgressPercentage(
   progress: IndexingProgressUpdate["progress"],
 ) {
@@ -65,7 +63,7 @@ function IndexingProgress() {
               "Your index appears corrupted. We recommend clearing and rebuilding it, " +
               "which may take time for large codebases.\n\n" +
               "For a faster rebuild without clearing data, press 'Shift + Command + P' to open " +
-              "the Command Palette, and type out 'Continue: Force Codebase Re-Indexing'"
+              "the Command Palette, and type out 'AXCode: Force Codebase Re-Indexing'"
             }
             onConfirm={() => {
               posthog.capture("rebuild_index_clicked");

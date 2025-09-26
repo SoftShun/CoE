@@ -3,10 +3,10 @@ import * as URI from "uri-js";
 import * as vscode from "vscode";
 
 import {
-    AddedLineDecorationManager,
-    RemovedLineDecorationManager,
-    belowIndexDecorationType,
-    indexDecorationType,
+  AddedLineDecorationManager,
+  RemovedLineDecorationManager,
+  belowIndexDecorationType,
+  indexDecorationType,
 } from "./decorations";
 
 import type { ApplyState, DiffLine } from "core";

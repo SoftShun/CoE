@@ -12,8 +12,8 @@ import {
   unrollAssistant,
   validateConfigYaml,
 } from "@continuedev/config-yaml";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { readFileSync, existsSync } from "node:fs";
 import { getContinueGlobalPath } from "../../util/paths";
 
 import {
@@ -54,12 +54,14 @@ interface UserSettings {
 
 function loadUserSettings(): UserSettings {
   const userSettingsPath = join(getContinueGlobalPath(), "users-setting.json");
-  
+
   if (!existsSync(userSettingsPath)) {
-    console.warn("users-setting.json not found in ~/.continue, using empty userToken");
+    console.warn(
+      "users-setting.json not found in ~/.continue, using empty userToken",
+    );
     return { userToken: "" };
   }
-  
+
   try {
     const userSettingsContent = readFileSync(userSettingsPath, "utf-8");
     const userSettings: UserSettings = JSON.parse(userSettingsContent);
@@ -193,15 +195,16 @@ async function configYamlToContinueConfig(options: {
 }): Promise<{ config: ContinueConfig; errors: ConfigValidationError[] }> {
   let { config, ide, ideSettings, ideInfo, uniqueId, llmLogger } = options;
 
-  console.log("🔍 configYamlToContinueConfig: userToken from ideSettings:", ideSettings.userToken);
+  console.log(
+    "🔍 configYamlToContinueConfig: userToken from ideSettings:",
+    ideSettings.userToken,
+  );
 
   const localErrors: ConfigValidationError[] = [];
-  
+
   // Extract custom settings from config.yaml
 
-
   const continueConfig: ContinueConfig = {
-
     slashCommands: [],
     tools: await getToolsForIde(ide),
     mcpServerStatuses: [],
@@ -227,11 +230,12 @@ async function configYamlToContinueConfig(options: {
     rules: [],
     userToken: ideSettings.userToken, // Add userToken to continueConfig
     // Add custom values directly to continueConfig
-
   };
 
-  console.log("🔍 configYamlToContinueConfig: Final continueConfig.userToken:", continueConfig.userToken);
-
+  console.log(
+    "🔍 configYamlToContinueConfig: Final continueConfig.userToken:",
+    continueConfig.userToken,
+  );
 
   // Right now, if there are any missing packages in the config, then we will just throw an error
   if (!isAssistantUnrolledNonNullable(config)) {
@@ -494,17 +498,17 @@ export async function loadContinueConfigFromYaml(options: {
   } = options;
 
   console.log("Original ideSettings.userToken:", ideSettings.userToken);
-  
+
   // Load user settings from users-setting.json
   const userSettings = loadUserSettings();
   console.log("UserSettings from file:", userSettings);
-  
+
   // Create modified ideSettings with userToken from users-setting.json
   const modifiedIdeSettings: IdeSettings = {
     ...ideSettings,
     userToken: userSettings.userToken || ideSettings.userToken,
   };
-  
+
   console.log("Modified ideSettings.userToken:", modifiedIdeSettings.userToken);
 
   const configYamlResult = await loadConfigYaml({

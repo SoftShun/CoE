@@ -1,7 +1,6 @@
 import { Tool, ToolCallState } from "core";
 import Mustache from "mustache";
 import { getStatusIntro } from "./utils";
-
 interface ToolCallStatusMessageProps {
   tool: Tool | undefined;
   toolCallState: ToolCallState;
@@ -56,7 +55,7 @@ export function ToolCallStatusMessage({
       className="text-description line-clamp-4 min-w-0 break-all"
       data-testid="tool-call-title"
     >
-      {`SKAX ${intro} ${message}`}
+      {`AXCode ${intro} ${message}`}
     </div>
   );
 }

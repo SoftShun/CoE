@@ -17,7 +17,11 @@ class EditDecorationManager {
   }
 
   private updateInEditMode(inEditMode: boolean) {
-    vscode.commands.executeCommand("setContext", "axcode.inEditMode", inEditMode);
+    vscode.commands.executeCommand(
+      "setContext",
+      "axcode.inEditMode",
+      inEditMode,
+    );
   }
 
   // Converts each range to a unique string for storing in the map

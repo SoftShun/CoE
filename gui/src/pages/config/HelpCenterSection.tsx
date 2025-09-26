@@ -1,6 +1,7 @@
+// gui/src/pages/config/HelpCenterSection.tsx
 import {
   DocumentArrowUpIcon,
-  PaintBrushIcon
+  PaintBrushIcon,
 } from "@heroicons/react/24/outline";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
