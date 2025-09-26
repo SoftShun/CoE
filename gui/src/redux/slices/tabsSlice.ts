@@ -39,7 +39,10 @@ export const tabsSlice = createSlice({
         tab.id === id ? { ...tab, ...updates } : tab,
       );
     },
-    addTab: (state, action: PayloadAction<Omit<Tab, 'timestamp'> & { timestamp?: number }>) => {
+    addTab: (
+      state,
+      action: PayloadAction<Omit<Tab, "timestamp"> & { timestamp?: number }>,
+    ) => {
       const newTab: Tab = {
         ...action.payload,
         timestamp: action.payload.timestamp || Date.now(),
