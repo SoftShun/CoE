@@ -172,7 +172,7 @@ export class VsCodeExtension {
     // Sidebar
     context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
-        "skax.skaxGUIView",
+        "axcode.axcodeGUIView",
         this.sidebar,
         {
           webviewOptions: { retainContextWhenHidden: true },
@@ -353,7 +353,7 @@ export class VsCodeExtension {
 
     context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
-        "skax.skaxConsoleView",
+        "axcode.axcodeConsoleView",
         this.consoleView,
       ),
     );
@@ -465,7 +465,7 @@ export class VsCodeExtension {
       if (e.provider.id === env.AUTH_TYPE) {
         void vscode.commands.executeCommand(
           "setContext",
-          "skax.isSignedInToControlPlane",
+          "axcode.isSignedInToControlPlane",
           true,
         );
 
@@ -476,7 +476,7 @@ export class VsCodeExtension {
       } else {
         void vscode.commands.executeCommand(
           "setContext",
-          "skax.isSignedInToControlPlane",
+          "axcode.isSignedInToControlPlane",
           false,
         );
 

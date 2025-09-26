@@ -3,10 +3,10 @@ import * as URI from "uri-js";
 import * as vscode from "vscode";
 
 import {
-  AddedLineDecorationManager,
-  RemovedLineDecorationManager,
-  belowIndexDecorationType,
-  indexDecorationType,
+    AddedLineDecorationManager,
+    RemovedLineDecorationManager,
+    belowIndexDecorationType,
+    indexDecorationType,
 } from "./decorations";
 
 import type { ApplyState, DiffLine } from "core";
@@ -91,7 +91,7 @@ export class VerticalDiffHandler implements vscode.Disposable {
   }
 
   async clear(accept: boolean) {
-    vscode.commands.executeCommand("setContext", "skax.streamingDiff", false);
+    vscode.commands.executeCommand("setContext", "axcode.streamingDiff", false);
 
     const removedRanges = this.removedLineDecorations.ranges;
     if (accept) {

@@ -11,7 +11,7 @@
     "generate-client:ALL": "npm run generate-client:typescript && npm run generate-client:python",
     "swagger-ui": "node swagger-ui-server.js"
   },
-  "author": "Continue Dev, Inc.",
+  "author": "SKAX DEV, Inc.",
   "license": "Apache-2.0",
   "dependencies": {
     "@continuedev/config-yaml": "file:../config-yaml",

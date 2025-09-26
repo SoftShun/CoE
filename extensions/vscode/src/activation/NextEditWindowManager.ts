@@ -11,8 +11,8 @@ import { NextEditLoggingService } from "core/nextEdit/NextEditLoggingService";
 import { NextEditProvider } from "core/nextEdit/NextEditProvider";
 import { getThemeString } from "../util/getTheme";
 import {
-  HandlerPriority,
-  SelectionChangeManager,
+    HandlerPriority,
+    SelectionChangeManager,
 } from "./SelectionChangeManager";
 
 export interface TextApplier {
@@ -408,7 +408,7 @@ export class NextEditWindowManager {
 
     // Log with accept = false.
     await vscode.commands.executeCommand(
-      "skax.logNextEditOutcomeReject",
+      "axcode.logNextEditOutcomeReject",
       this.mostRecentCompletionId,
       this.loggingService,
     );
@@ -488,7 +488,7 @@ export class NextEditWindowManager {
 
     // Log with accept = true.
     await vscode.commands.executeCommand(
-      "skax.logNextEditOutcomeAccept",
+      "axcode.logNextEditOutcomeAccept",
       this.mostRecentCompletionId,
       this.loggingService,
     );
