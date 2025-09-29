@@ -73,14 +73,14 @@ export function ModelsSection() {
           onSelect={(model) => handleRoleUpdate("embed", model)}
           setupURL="https://docs.continue.dev/customize/model-roles/embeddings"
         />
-        <ModelRoleSelector
+        {/* <ModelRoleSelector
           displayName="Rerank"
           description="Used for reranking results from the @codebase and @docs context providers"
           models={config.modelsByRole.rerank}
           selectedModel={config.selectedModelByRole.rerank}
           onSelect={(model) => handleRoleUpdate("rerank", model)}
           setupURL="https://docs.continue.dev/customize/model-roles/reranking"
-        />
+        /> */}
       </div>
     </div>
   );
