@@ -22,7 +22,7 @@ const CONTINUE_GLOBAL_DIR = (() => {
       ? configPath
       : path.resolve(process.cwd(), configPath);
   }
-  return path.join(os.homedir(), ".continue");
+  return path.join(os.homedir(), ".axcode");
 })();
 
 // export const DEFAULT_CONFIG_TS_CONTENTS = `import { Config } from "./types"\n\nexport function modifyConfig(config: Config): Config {
@@ -57,7 +57,7 @@ export function getGlobalContinueIgnorePath(): string {
 }
 
 export function getContinueGlobalPath(): string {
-  // This is ~/.continue on mac/linux
+  // This is ~/.axcode on mac/linux
   const continuePath = CONTINUE_GLOBAL_DIR;
   if (!fs.existsSync(continuePath)) {
     fs.mkdirSync(continuePath);
@@ -76,16 +76,15 @@ export function getContinueGlobalPath(): string {
   }
   return continuePath;
 }
-
+export function getUsersSettingFilePath(): string {
+  return path.join(getContinueGlobalPath(), "users-setting.json");
+}
 export function getSessionsFolderPath(): string {
   const sessionsPath = path.join(getContinueGlobalPath(), "sessions");
   if (!fs.existsSync(sessionsPath)) {
     fs.mkdirSync(sessionsPath);
   }
   return sessionsPath;
-}
-export function getUsersSettingFilePath(): string {
-  return path.join(getContinueGlobalPath(), "users-setting.json");
 }
 
 export function getIndexFolderPath(): string {
@@ -213,10 +212,10 @@ export function getTsConfigPath(): string {
 
 export function getContinueRcPath(): string {
   // Disable indexing of the config folder to prevent infinite loops
-  const continuercPath = path.join(getContinueGlobalPath(), ".continuerc.json");
-  if (!fs.existsSync(continuercPath)) {
+  const axcodercPath = path.join(getContinueGlobalPath(), ".axcoderc.json");
+  if (!fs.existsSync(axcodercPath)) {
     fs.writeFileSync(
-      continuercPath,
+      axcodercPath,
       JSON.stringify(
         {
           disableIndexing: true,
@@ -226,7 +225,7 @@ export function getContinueRcPath(): string {
       ),
     );
   }
-  return continuercPath;
+  return axcodercPath;
 }
 
 function getDevDataPath(): string {
