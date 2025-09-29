@@ -16,6 +16,7 @@ import { saveCurrentSession } from "../redux/thunks/session";
 import { fontSize, isMetaEquivalentKeyPressed } from "../util";
 import { incrementFreeTrialCount } from "../util/freeTrial";
 import { ROUTES } from "../util/navigation";
+import { FatalErrorIndicator } from "./config/FatalErrorNotice";
 import TextDialog from "./dialogs";
 import { GenerateRuleDialog } from "./GenerateRuleDialog";
 import { LumpProvider } from "./mainInput/Lump/LumpContext";
@@ -27,7 +28,6 @@ import {
 } from "./OnboardingCard";
 import OSRContextMenu from "./OSRContextMenu";
 import PostHogPageView from "./PosthogPageView";
-import { FatalErrorIndicator } from "./config/FatalErrorNotice";
 
 const LayoutTopDiv = styled(CustomScrollbarDiv)`
   height: 100%;
@@ -115,14 +115,6 @@ const Layout = () => {
     },
     [location.pathname, isInEdit],
     location.pathname === ROUTES.HOME,
-  );
-
-  useWebviewListener(
-    "addModel",
-    async () => {
-      navigate("/models");
-    },
-    [navigate],
   );
 
   useWebviewListener(

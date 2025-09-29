@@ -15,8 +15,6 @@ import { setHasReasoningEnabled } from "../../redux/slices/sessionSlice";
 import { exitEdit } from "../../redux/thunks/edit";
 import { getAltKeyLabel, isMetaEquivalentKeyPressed } from "../../util";
 import { ToolTip } from "../gui/Tooltip";
-import ModelSelect from "../modelSelection/ModelSelect";
-import { ModeSelect } from "../ModeSelect";
 import { Button } from "../ui";
 import { useFontSize } from "../ui/font";
 import ContextStatus from "./ContextStatus";
@@ -81,18 +79,15 @@ function InputToolbar(props: InputToolbarProps) {
         <div className="xs:gap-1.5 flex flex-row items-center gap-1">
           {!isInEdit && (
             <HoverItem data-tooltip-id="mode-select-tooltip" className="!p-0">
-              <ModeSelect />
               <ToolTip id="mode-select-tooltip" place="top">
                 Select Mode
               </ToolTip>
             </HoverItem>
           )}
-          <HoverItem data-tooltip-id="model-select-tooltip" className="!p-0">
-            <ModelSelect />
-            <ToolTip id="model-select-tooltip" place="top">
-              Select Model
-            </ToolTip>
-          </HoverItem>
+          <HoverItem
+            data-tooltip-id="model-select-tooltip"
+            className="!p-0"
+          ></HoverItem>
           <div className="xs:flex text-description -mb-1 hidden items-center transition-colors duration-200">
             {props.toolbarOptions?.hideImageUpload ||
               (supportsImages && (

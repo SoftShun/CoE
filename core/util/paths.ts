@@ -22,7 +22,7 @@ const CONTINUE_GLOBAL_DIR = (() => {
       ? configPath
       : path.resolve(process.cwd(), configPath);
   }
-  return path.join(os.homedir(), ".axcode");
+  return path.join(os.homedir(), ".continue");
 })();
 
 // export const DEFAULT_CONFIG_TS_CONTENTS = `import { Config } from "./types"\n\nexport function modifyConfig(config: Config): Config {
@@ -61,6 +61,18 @@ export function getContinueGlobalPath(): string {
   const continuePath = CONTINUE_GLOBAL_DIR;
   if (!fs.existsSync(continuePath)) {
     fs.mkdirSync(continuePath);
+
+    // Create users-setting.json file after creating the directory
+    const usersSettingPath = path.join(continuePath, "users-setting.json");
+    const defaultUserSettings = {
+      userToken: "abc123_my_secret_token",
+    };
+
+    // Write the JSON file with the default settings
+    fs.writeFileSync(
+      usersSettingPath,
+      JSON.stringify(defaultUserSettings, null, 2),
+    );
   }
   return continuePath;
 }
@@ -71,6 +83,9 @@ export function getSessionsFolderPath(): string {
     fs.mkdirSync(sessionsPath);
   }
   return sessionsPath;
+}
+export function getUsersSettingFilePath(): string {
+  return path.join(getContinueGlobalPath(), "users-setting.json");
 }
 
 export function getIndexFolderPath(): string {
@@ -198,10 +213,10 @@ export function getTsConfigPath(): string {
 
 export function getContinueRcPath(): string {
   // Disable indexing of the config folder to prevent infinite loops
-  const axcodercPath = path.join(getContinueGlobalPath(), ".axcoderc.json");
-  if (!fs.existsSync(axcodercPath)) {
+  const continuercPath = path.join(getContinueGlobalPath(), ".continuerc.json");
+  if (!fs.existsSync(continuercPath)) {
     fs.writeFileSync(
-      axcodercPath,
+      continuercPath,
       JSON.stringify(
         {
           disableIndexing: true,
@@ -211,7 +226,7 @@ export function getContinueRcPath(): string {
       ),
     );
   }
-  return axcodercPath;
+  return continuercPath;
 }
 
 function getDevDataPath(): string {
