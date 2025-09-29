@@ -271,7 +271,11 @@ export class VerticalDiffManager {
         throw new Error(message);
       }
     } finally {
-      vscode.commands.executeCommand("setContext", "axcode.streamingDiff", false);
+      vscode.commands.executeCommand(
+        "setContext",
+        "axcode.streamingDiff",
+        false,
+      );
     }
   }
 
@@ -294,7 +298,11 @@ export class VerticalDiffManager {
     toolCallId?: string;
     rulesToInclude: undefined | RuleWithSource[];
   }): Promise<string | undefined> {
-    void vscode.commands.executeCommand("setContext", "axcode.diffVisible", true);
+    void vscode.commands.executeCommand(
+      "setContext",
+      "axcode.diffVisible",
+      true,
+    );
 
     let editor = vscode.window.activeTextEditor;
 

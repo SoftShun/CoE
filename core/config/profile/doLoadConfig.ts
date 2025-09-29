@@ -169,7 +169,11 @@ export default async function doLoadConfig(options: {
     const { default: RagContextProvider } = await import(
       "../../context/providers/RagContextProvider.js"
     );
-    newConfig.contextProviders.push(new RagContextProvider({}));
+    newConfig.contextProviders.push(
+      new RagContextProvider({
+        apiBaseUrl: "http://greatcoe.cafe24.com:8080/rag",
+      }),
+    );
   }
 
   // Add current file as context if setting is enabled

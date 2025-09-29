@@ -1,3 +1,4 @@
+// gui/src/pages/gui/Chat.tsx
 import {
   ArrowLeftIcon,
   ChatBubbleOvalLeftIcon,
@@ -16,6 +17,7 @@ import {
 import { ErrorBoundary } from "react-error-boundary";
 import styled from "styled-components";
 import { Button, lightGray, vscBackground } from "../../components";
+import { ChatActionBar } from "../../components/chat/ChatActionBar";
 import { useFindWidget } from "../../components/find/FindWidget";
 import TimelineItem from "../../components/gui/TimelineItem";
 import { NewSessionButton } from "../../components/mainInput/belowMainInput/NewSessionButton";
@@ -23,7 +25,6 @@ import ThinkingBlockPeek from "../../components/mainInput/belowMainInput/Thinkin
 import SkaxInputBox from "../../components/mainInput/ContinueInputBox";
 import { useOnboardingCard } from "../../components/OnboardingCard";
 import StepContainer from "../../components/StepContainer";
-import { TabBar } from "../../components/TabBar/TabBar";
 import { IdeMessengerContext } from "../../context/IdeMessenger";
 import { useWebviewListener } from "../../hooks/useWebviewListener";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -35,10 +36,17 @@ import {
   cancelToolCall,
   ChatHistoryItemWithMessageId,
   newSession,
+  updateSessionMetadata,
   updateToolCallOutput,
 } from "../../redux/slices/sessionSlice";
 import { streamEditThunk } from "../../redux/thunks/edit";
-import { loadLastSession } from "../../redux/thunks/session";
+import {
+  deleteSession,
+  loadLastSession,
+  loadSession,
+  refreshSessionMetadata,
+  updateSession,
+} from "../../redux/thunks/session";
 import { streamResponseThunk } from "../../redux/thunks/streamResponse";
 import { isJetBrains, isMetaEquivalentKeyPressed } from "../../util";
 import { ToolCallDiv } from "./ToolCallDiv";
@@ -106,6 +114,25 @@ export function Chat() {
     (store) => store.config?.config.selectedModelByRole,
   );
   const isStreaming = useAppSelector((state) => state.session.isStreaming);
+  const sessionTitle = useAppSelector((state) => state.session.title);
+  const sessionId = useAppSelector((state) => state.session.id);
+  const sessionMetadata = useAppSelector((state) =>
+    state.session.allSessionMetadata?.find((s) => s.sessionId === sessionId),
+  );
+  const allSessionMetadata = useAppSelector(
+    (state) => state.session.allSessionMetadata || [],
+  );
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  // Chat tabs state - only show tabs for sessions with messages
+  const [chatTabs, setChatTabs] = useState<
+    Array<{
+      id: string;
+      title: string;
+      timestamp: number;
+      isActive: boolean;
+    }>
+  >([]);
   const [stepsOpen] = useState<(boolean | undefined)[]>([]);
   const mainTextInputRef = useRef<HTMLInputElement>(null);
   const stepsDivRef = useRef<HTMLDivElement>(null);
@@ -151,6 +178,110 @@ export function Chat() {
     tabsRef,
     isStreaming,
   );
+
+  // Create tab when first message is sent to a new session
+  useEffect(() => {
+    console.log("🔍 Tab creation useEffect triggered:", {
+      historyLength: history.length,
+      sessionId,
+      currentTabsCount: chatTabs.length,
+      currentTabs: chatTabs.map((t) => ({ id: t.id, title: t.title })),
+    });
+
+    if (history.length > 0 && sessionId) {
+      setChatTabs((prevTabs) => {
+        // 강력한 중복 방지: 동일한 sessionId 탭이 이미 존재하는지 확인
+        const existingTab = prevTabs.find((tab) => tab.id === sessionId);
+
+        console.log("🔍 Tab existence check:", {
+          sessionId,
+          existingTab: existingTab
+            ? { id: existingTab.id, title: existingTab.title }
+            : null,
+          currentTabs: prevTabs.map((t) => ({ id: t.id, title: t.title })),
+        });
+
+        if (!existingTab) {
+          // 새 탭 생성
+          const newTabNumber = prevTabs.length + 1;
+          const autoTitle = `Chat ${newTabNumber}`;
+
+          console.log("🆕 Creating new tab:", {
+            sessionId,
+            autoTitle,
+            newTabNumber,
+          });
+
+          return [
+            ...prevTabs.map((tab) => ({ ...tab, isActive: false })),
+            {
+              id: sessionId,
+              title: autoTitle,
+              timestamp: Date.now(),
+              isActive: true,
+            },
+          ];
+        } else {
+          // 기존 탭 활성화만 처리
+          const needsActivation =
+            !existingTab.isActive ||
+            prevTabs.some((tab) => tab.id !== sessionId && tab.isActive);
+
+          console.log("🔍 Tab activation update:", {
+            sessionId,
+            needsActivation,
+            currentActiveTab: prevTabs.find((t) => t.isActive)?.id,
+          });
+
+          if (!needsActivation) return prevTabs;
+
+          return prevTabs.map((tab) => ({
+            ...tab,
+            isActive: tab.id === sessionId,
+          }));
+        }
+      });
+    }
+  }, [history.length, sessionId]); // sessionTitle 의존성 제거
+
+  // 별도의 useEffect로 제목 업데이트 처리
+  useEffect(() => {
+    if (sessionTitle && sessionId) {
+      console.log("🔍 Title update useEffect triggered:", {
+        sessionId,
+        sessionTitle,
+      });
+
+      setChatTabs((prevTabs) => {
+        const targetTab = prevTabs.find((tab) => tab.id === sessionId);
+
+        // 탭이 존재하고 제목이 다른 경우에만 업데이트
+        const shouldUpdateTitle = targetTab && targetTab.title !== sessionTitle;
+
+        console.log("🔍 Title update check:", {
+          sessionId,
+          targetTab: targetTab
+            ? { id: targetTab.id, title: targetTab.title }
+            : null,
+          shouldUpdateTitle,
+          newTitle: sessionTitle,
+        });
+
+        if (shouldUpdateTitle) {
+          console.log("📝 Updating tab title:", {
+            sessionId,
+            oldTitle: targetTab.title,
+            newTitle: sessionTitle,
+          });
+
+          return prevTabs.map((tab) =>
+            tab.id === sessionId ? { ...tab, title: sessionTitle } : tab,
+          );
+        }
+        return prevTabs;
+      });
+    }
+  }, [sessionTitle, sessionId]);
 
   const pendingToolCalls = useAppSelector(selectPendingToolCalls);
   const pendingApplyStates = useAppSelector(selectDoneApplyStates);
@@ -383,11 +514,164 @@ export function Chat() {
     [sendInput, isLastUserInput, history, stepsOpen],
   );
 
+  const handleNewChat = useCallback(() => {
+    dispatch(newSession());
+  }, [dispatch]);
+
+  const handleToggleHistory = useCallback(() => {
+    if (!isHistoryOpen) {
+      // Refresh session metadata when opening history
+      dispatch(refreshSessionMetadata({}));
+    }
+    setIsHistoryOpen((prev) => !prev);
+  }, [dispatch, isHistoryOpen]);
+
+  // Tab handlers
+  const handleTabSelect = useCallback(
+    (tabId: string) => {
+      if (tabId !== sessionId) {
+        dispatch(loadSession({ sessionId: tabId, saveCurrentSession: true }));
+      }
+    },
+    [dispatch, sessionId],
+  );
+
+  const handleTabClose = useCallback(
+    (tabId: string) => {
+      // Remove tab from state
+      setChatTabs((prevTabs) => {
+        const remainingTabs = prevTabs.filter((tab) => tab.id !== tabId);
+
+        // If closing current session, switch to another or create new
+        if (tabId === sessionId && remainingTabs.length > 0) {
+          dispatch(
+            loadSession({
+              sessionId: remainingTabs[0].id,
+              saveCurrentSession: false,
+            }),
+          );
+        } else if (remainingTabs.length === 0) {
+          dispatch(newSession());
+        }
+
+        return remainingTabs;
+      });
+    },
+    [dispatch, sessionId],
+  );
+
+  // Session deletion handler
+  const handleSessionDelete = useCallback(
+    (sessionId: string) => {
+      console.log(
+        "🗑️ Chat.tsx handleSessionDelete called for session:",
+        sessionId,
+      );
+
+      // Delete the session from backend and update UI
+      console.log("🗑️ Dispatching deleteSession thunk...");
+      dispatch(deleteSession(sessionId));
+
+      // Remove tab from local state
+      console.log("🗑️ Removing tab from local state...");
+      setChatTabs((prevTabs) => prevTabs.filter((tab) => tab.id !== sessionId));
+    },
+    [dispatch],
+  );
+
+  const handleTitleChange = useCallback(
+    async (newTitle: string) => {
+      if (sessionId && newTitle && newTitle !== sessionTitle) {
+        const session = {
+          sessionId,
+          title: newTitle,
+          workspaceDirectory: window.workspacePaths?.[0] || "",
+          history,
+        };
+        await dispatch(updateSession(session));
+      }
+    },
+    [dispatch, sessionId, sessionTitle, history],
+  );
+
+  const handleSessionEdit = useCallback(
+    async (editSessionId: string, newTitle: string) => {
+      if (editSessionId !== sessionId) {
+        // Update non-current session metadata directly
+        console.log(
+          "🖊️ Updating session metadata:",
+          editSessionId,
+          "to:",
+          newTitle,
+        );
+        dispatch(
+          updateSessionMetadata({
+            sessionId: editSessionId,
+            title: newTitle,
+          }),
+        );
+      } else {
+        // If editing current session, use existing handler
+        await handleTitleChange(newTitle);
+      }
+    },
+    [sessionId, handleTitleChange, dispatch],
+  );
+
+  const handleTabTitleEdit = useCallback(
+    async (tabId: string, newTitle: string) => {
+      // Update the tab title in chat tabs state
+      setChatTabs((prevTabs) =>
+        prevTabs.map((tab) =>
+          tab.id === tabId ? { ...tab, title: newTitle } : tab,
+        ),
+      );
+
+      // If editing the current session, also update session data
+      if (tabId === sessionId) {
+        await handleTitleChange(newTitle);
+      }
+    },
+    [sessionId, handleTitleChange],
+  );
+
+  const handleSessionSelect = useCallback(
+    async (selectedSessionId: string) => {
+      setIsHistoryOpen(false);
+      if (selectedSessionId !== sessionId) {
+        await dispatch(
+          loadSession({
+            sessionId: selectedSessionId,
+            saveCurrentSession: true,
+          }),
+        );
+      }
+    },
+    [dispatch, sessionId],
+  );
+
+  const handleCloseSidebar = useCallback(() => {
+    setIsHistoryOpen(false);
+  }, []);
+
   const showScrollbar = showChatScrollbar ?? window.innerHeight > 5000;
 
   return (
     <>
-      {!!showSessionTabs && !isInEdit && <TabBar ref={tabsRef} />}
+      <ChatActionBar
+        onNewChat={handleNewChat}
+        onToggleHistory={handleToggleHistory}
+        isHistoryOpen={isHistoryOpen}
+        tabs={chatTabs}
+        onTabSelect={handleTabSelect}
+        onTabClose={handleTabClose}
+        onTabTitleEdit={handleTabTitleEdit}
+        sessions={allSessionMetadata}
+        currentSessionId={sessionId}
+        onSessionSelect={handleSessionSelect}
+        onSessionDelete={handleSessionDelete}
+        onSessionEdit={handleSessionEdit}
+      />
       {widget}
 
       <StepsDiv
@@ -396,25 +680,25 @@ export function Chat() {
       >
         {highlights}
         {history.map((item, index: number) => (
-          <div
+          <ErrorBoundary
             key={item.message.id}
-            style={{
-              minHeight: index === history.length - 1 ? "200px" : 0,
+            FallbackComponent={fallbackRender}
+            onReset={() => {
+              dispatch(newSession());
             }}
           >
-            <ErrorBoundary
-              FallbackComponent={fallbackRender}
-              onReset={() => {
-                dispatch(newSession());
+            <div
+              style={{
+                minHeight: index === history.length - 1 ? "200px" : 0,
               }}
             >
               {renderChatHistoryItem(item, index)}
-            </ErrorBoundary>
-            {index === history.length - 1 && <InlineErrorMessage />}
-          </div>
+              {index === history.length - 1 && <InlineErrorMessage />}
+            </div>
+          </ErrorBoundary>
         ))}
       </StepsDiv>
-      <div className={"relative"}>
+      <div className="relative">
         <SkaxInputBox
           isMainInput
           isLastUserInput={false}
@@ -425,35 +709,35 @@ export function Chat() {
         />
 
         <div
+          className="flex flex-row items-center justify-between pb-1 pl-0.5 pr-2"
           style={{
             pointerEvents: isStreaming ? "none" : "auto",
           }}
         >
-          <div className="flex flex-row items-center justify-between pb-1 pl-0.5 pr-2">
-            <div className="xs:inline hidden">
-              {history.length === 0 && lastSessionId && !isInEdit && (
-                <NewSessionButton
-                  onClick={async () => {
-                    await dispatch(
-                      loadLastSession({
-                        saveCurrentSession: true,
-                      }),
-                    );
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <ArrowLeftIcon className="h-3 w-3" />
-                  <span className="text-xs">Last Session</span>
-                </NewSessionButton>
-              )}
-            </div>
+          <div className="xs:inline hidden">
+            {history.length === 0 && lastSessionId && !isInEdit && (
+              <NewSessionButton
+                onClick={async () => {
+                  await dispatch(
+                    loadLastSession({
+                      saveCurrentSession: true,
+                    }),
+                  );
+                }}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeftIcon className="h-3 w-3" />
+                <span className="text-xs">Last Session</span>
+              </NewSessionButton>
+            )}
           </div>
-          <FatalErrorIndicator />
-          {!hasDismissedExploreDialog && <ExploreDialogWatcher />}
-          {history.length === 0 && (
-            <EmptyChatBody showOnboardingCard={onboardingCard.show} />
-          )}
         </div>
+
+        <FatalErrorIndicator />
+        {!hasDismissedExploreDialog && <ExploreDialogWatcher />}
+        {history.length === 0 && (
+          <EmptyChatBody showOnboardingCard={onboardingCard.show} />
+        )}
       </div>
     </>
   );
