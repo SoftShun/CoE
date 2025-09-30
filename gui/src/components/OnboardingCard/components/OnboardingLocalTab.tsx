@@ -14,10 +14,6 @@ import { useAppDispatch } from "../../../redux/hooks";
 import { setDialogMessage, setShowDialog } from "../../../redux/slices/uiSlice";
 import { updateSelectedModelByRole } from "../../../redux/thunks/updateSelectedModelByRole";
 import { useSubmitOnboarding } from "../hooks/useSubmitOnboarding";
-import OllamaModelDownload from "./OllamaModelDownload";
-import { OllamaStatus } from "./OllamaStatus";
-
-const OLLAMA_CHECK_INTERVAL_MS = 3000;
 
 interface OnboardingLocalTabProps {
   isDialog?: boolean;
@@ -95,10 +91,7 @@ export function OnboardingLocalTab({ isDialog }: OnboardingLocalTabProps) {
       }
     };
 
-    const intervalId = setInterval(
-      fetchDownloadedModels,
-      OLLAMA_CHECK_INTERVAL_MS,
-    );
+    const intervalId = setInterval(fetchDownloadedModels);
 
     void fetchDownloadedModels();
 
@@ -139,30 +132,7 @@ export function OnboardingLocalTab({ isDialog }: OnboardingLocalTabProps) {
     <div className="flex h-full w-full items-center justify-center">
       <div className="w-full max-w-md">
         <div className="mt-3 flex flex-col gap-1 px-2">
-          <div className="flex flex-col">
-            <p className="mb-0 text-base font-bold leading-tight">
-              Install Ollama
-            </p>
-            <OllamaStatus isOllamaConnected={isOllamaConnected} />
-          </div>
-
-          <OllamaModelDownload
-            title="Download Chat model"
-            modelName={LOCAL_ONBOARDING_CHAT_MODEL}
-            hasDownloaded={hasDownloadedChatModel}
-          />
-
-          <OllamaModelDownload
-            title="Download Autocomplete model"
-            modelName={LOCAL_ONBOARDING_FIM_MODEL}
-            hasDownloaded={hasDownloadedAutocompleteModel}
-          />
-
-          <OllamaModelDownload
-            title="Download Embeddings model"
-            modelName={LOCAL_ONBOARDING_EMBEDDINGS_MODEL}
-            hasDownloaded={hasDownloadedEmbeddingsModel}
-          />
+          <div className="flex flex-col"></div>
 
           <div className="mt-4 w-full">
             <Button

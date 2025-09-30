@@ -38,14 +38,14 @@ export function ModelsSection() {
           onSelect={(model) => handleRoleUpdate("chat", model)}
           setupURL="https://docs.continue.dev/chat/model-setup"
         />
-        <ModelRoleSelector
+        {/* <ModelRoleSelector
           displayName="Autocomplete"
           description="Used to generate code completion suggestions"
           models={config.modelsByRole.autocomplete}
           selectedModel={config.selectedModelByRole.autocomplete}
           onSelect={(model) => handleRoleUpdate("autocomplete", model)}
           setupURL="https://docs.continue.dev/autocomplete/model-setup"
-        />
+        /> */}
         {/* Jetbrains has a model selector inline */}
         {!jetbrains && (
           <ModelRoleSelector
@@ -73,14 +73,14 @@ export function ModelsSection() {
           onSelect={(model) => handleRoleUpdate("embed", model)}
           setupURL="https://docs.continue.dev/customize/model-roles/embeddings"
         />
-        <ModelRoleSelector
+        {/* <ModelRoleSelector
           displayName="Rerank"
           description="Used for reranking results from the @codebase and @docs context providers"
           models={config.modelsByRole.rerank}
           selectedModel={config.selectedModelByRole.rerank}
           onSelect={(model) => handleRoleUpdate("rerank", model)}
           setupURL="https://docs.continue.dev/customize/model-roles/reranking"
-        />
+        /> */}
       </div>
     </div>
   );

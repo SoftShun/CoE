@@ -57,14 +57,28 @@ export function getGlobalContinueIgnorePath(): string {
 }
 
 export function getContinueGlobalPath(): string {
-  // This is ~/.continue on mac/linux
+  // This is ~/.axcode on mac/linux
   const continuePath = CONTINUE_GLOBAL_DIR;
   if (!fs.existsSync(continuePath)) {
     fs.mkdirSync(continuePath);
+
+    // Create users-setting.json file after creating the directory
+    const usersSettingPath = path.join(continuePath, "users-setting.json");
+    const defaultUserSettings = {
+      userToken: "abc123_my_secret_token",
+    };
+
+    // Write the JSON file with the default settings
+    fs.writeFileSync(
+      usersSettingPath,
+      JSON.stringify(defaultUserSettings, null, 2),
+    );
   }
   return continuePath;
 }
-
+export function getUsersSettingFilePath(): string {
+  return path.join(getContinueGlobalPath(), "users-setting.json");
+}
 export function getSessionsFolderPath(): string {
   const sessionsPath = path.join(getContinueGlobalPath(), "sessions");
   if (!fs.existsSync(sessionsPath)) {

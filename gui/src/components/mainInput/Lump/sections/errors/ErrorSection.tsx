@@ -29,7 +29,7 @@ export function ErrorSection() {
         >
           Reload
         </div>
-        <div
+        {/* <div
           onClick={() => {
             ideMessenger.post(
               "openUrl",
@@ -39,7 +39,7 @@ export function ErrorSection() {
           className="text-description cursor-pointer text-xs underline"
         >
           Help
-        </div>
+        </div> */}
       </div>
       <ul className="m-0 list-none space-y-4 p-0">
         {sortedErrors.map((error, index) => (
