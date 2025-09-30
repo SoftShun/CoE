@@ -37,7 +37,7 @@ export async function* llmStreamChat(
     context: (completionOptions as any).context || "continue.dev",
   };
 
-  console.log("=== CONTINUE.DEV STREAMCHAT DEBUG ===");
+  console.log("=== AXCODE.DEV STREAMCHAT DEBUG ===");
   console.log(
     "Original completionOptions:",
     JSON.stringify(

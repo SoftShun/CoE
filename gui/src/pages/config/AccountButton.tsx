@@ -18,13 +18,14 @@ export function AccountButton() {
 
   if (!session) {
     return (
-      <Button
-        variant="outline"
-        className="mb-1 whitespace-nowrap py-1"
-        onClick={() => login(false)}
-      >
-        Sign in
-      </Button>
+      // <Button
+      //   variant="outline"
+      //   className="mb-1 whitespace-nowrap py-1"
+      //   onClick={() => login(false)}
+      // >
+      //   Sign in
+      // </Button>
+      <></>
     );
   }
 
