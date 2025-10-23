@@ -87,6 +87,10 @@ export class MessageIde implements IDE {
     return this.request("showToast", params);
   };
 
+  async showConfirmDialog(message: string, title?: string): Promise<boolean> {
+    return this.request("showConfirmDialog", { message, title });
+  }
+
   getRepoName(dir: string): Promise<string | undefined> {
     return this.request("getRepoName", { dir });
   }
@@ -166,6 +170,10 @@ export class MessageIde implements IDE {
 
   async writeFile(fileUri: string, contents: string): Promise<void> {
     await this.request("writeFile", { path: fileUri, contents });
+  }
+
+  async deleteFile(fileUri: string): Promise<void> {
+    await this.request("deleteFile", { path: fileUri });
   }
 
   async showVirtualFile(title: string, contents: string): Promise<void> {

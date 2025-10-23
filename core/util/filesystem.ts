@@ -36,6 +36,10 @@ class FileSystemIde implements IDE {
     return Promise.resolve();
   }
 
+  async showConfirmDialog(message: string, title?: string): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
   fileExists(fileUri: string): Promise<boolean> {
     const filepath = fileURLToPath(fileUri);
     return Promise.resolve(fs.existsSync(filepath));
@@ -196,6 +200,18 @@ class FileSystemIde implements IDE {
     const filepath = fileURLToPath(fileUri);
     return new Promise((resolve, reject) => {
       fs.writeFile(filepath, contents, (err) => {
+        if (err) {
+          reject(err);
+        }
+        resolve();
+      });
+    });
+  }
+
+  deleteFile(fileUri: string): Promise<void> {
+    const filepath = fileURLToPath(fileUri);
+    return new Promise((resolve, reject) => {
+      fs.unlink(filepath, (err) => {
         if (err) {
           reject(err);
         }

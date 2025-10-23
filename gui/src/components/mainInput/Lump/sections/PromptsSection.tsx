@@ -2,6 +2,7 @@ import { parseConfigYaml } from "@continuedev/config-yaml";
 import {
   BookmarkIcon as BookmarkOutline,
   PencilIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import { BookmarkIcon as BookmarkSolid } from "@heroicons/react/24/solid";
 import { SlashCommandDescWithSource } from "core";
@@ -24,6 +25,7 @@ interface PromptRowProps {
   isBookmarked: boolean;
   setIsBookmarked: (isBookmarked: boolean) => void;
   onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 /**
@@ -34,6 +36,7 @@ function PromptRow({
   isBookmarked,
   setIsBookmarked,
   onEdit,
+  onDelete,
 }: PromptRowProps) {
   const { mainEditor } = useMainEditor();
   const { hideLump } = useLump();
@@ -60,7 +63,22 @@ function PromptRow({
     }
   };
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log("[PromptsSection] Delete clicked:", {
+      promptName: prompt.name,
+      promptFile: prompt.promptFile,
+      canDelete,
+      hasOnDelete: !!onDelete
+    });
+    if (onDelete) {
+      onDelete();
+    }
+  };
+
   const canEdit =
+    prompt.promptFile && !prompt.promptFile.startsWith("builtin:");
+  const canDelete =
     prompt.promptFile && !prompt.promptFile.startsWith("builtin:");
 
   return (
@@ -95,6 +113,11 @@ function PromptRow({
             <BookmarkOutline className="h-3 w-3" />
           )}
         </div>
+        <TrashIcon
+          className={`h-3 w-3 cursor-pointer text-gray-400 hover:brightness-125 ${!canDelete ? "pointer-events-none cursor-not-allowed opacity-50" : ""}`}
+          onClick={canDelete ? handleDeleteClick : undefined}
+          aria-disabled={!canDelete}
+        />
       </div>
     </div>
   );
@@ -104,7 +127,7 @@ function PromptRow({
  * Section that displays all available prompts with bookmarking functionality
  */
 export function PromptsSection() {
-  const { selectedProfile } = useAuth();
+  const { selectedProfile, refreshProfiles } = useAuth();
   const { isCommandBookmarked, toggleBookmark } = useBookmarkedSlashCommands();
   const ideMessenger = useContext(IdeMessengerContext);
 
@@ -130,9 +153,49 @@ export function PromptsSection() {
     }
   };
 
+  const handleDelete = async (prompt: PromptCommandWithSlug) => {
+    console.log("[PromptsSection] handleDelete called:", {
+      promptName: prompt.name,
+      promptFile: prompt.promptFile,
+      isBuiltin: prompt.promptFile?.startsWith("builtin:")
+    });
+
+    if (!prompt.promptFile || prompt.promptFile.startsWith("builtin:")) {
+      console.log("[PromptsSection] Delete aborted - no promptFile or builtin");
+      return;
+    }
+
+    const response = await ideMessenger.request("showConfirmDialog", {
+      message: `"${prompt.name}" 프롬프트를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`,
+    });
+
+    console.log("[PromptsSection] User confirmation response:", response);
+
+    if (response.status === "success" && response.content) {
+      try {
+        console.log("[PromptsSection] Sending delete request for:", prompt.promptFile);
+        await ideMessenger.request("config/deletePromptFile", {
+          promptFile: prompt.promptFile,
+        });
+        console.log("[PromptsSection] Delete request completed");
+      } catch (error) {
+        console.error("Failed to delete prompt file:", error);
+        await ideMessenger.request("showToast", ["error", `프롬프트 파일 삭제에 실패했습니다: ${error}`]);
+      }
+      console.log("[PromptsSection] Delete request sent");
+    } else {
+      console.log("[PromptsSection] User cancelled deletion");
+    }
+  };
+
   const sortedCommands = useMemo(() => {
     const promptsWithSlug: PromptCommandWithSlug[] =
       structuredClone(slashCommands);
+    console.log("[PromptsSection] All prompts:", promptsWithSlug.map(p => ({
+      name: p.name,
+      promptFile: p.promptFile,
+      hasPromptFile: !!p.promptFile
+    })));
     // get the slugs from rawYaml
     if (selectedProfile?.rawYaml) {
       const parsed = parseConfigYaml(selectedProfile.rawYaml);
@@ -172,6 +235,7 @@ export function PromptsSection() {
           isBookmarked={isCommandBookmarked(prompt.name)}
           setIsBookmarked={() => toggleBookmark(prompt)}
           onEdit={() => handleEdit(prompt)}
+          onDelete={() => handleDelete(prompt)}
         />
       ))}
       <ExploreBlocksButton blockType="prompts" />

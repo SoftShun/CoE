@@ -20,6 +20,7 @@ export const defaultModelVsCode: NonNullable<ConfigYaml["models"]>[number][] = [
     model: "gpt-4o-mini",
     apiBase: "http://10.34.238.61:8000/v1",
     apiKey: "",
+    capabilities: ["tool_use", "image_input"],
     roles: ["chat", "edit", "apply"],
     defaultCompletionOptions: {
       temperature: 0.7,

@@ -2,6 +2,7 @@ import {
   ToCoreFromWebviewProtocol,
   ToWebviewFromCoreProtocol,
 } from "./coreWebview";
+import { ToCoreFromIdeOrWebviewProtocol } from "./core";
 import { ToWebviewOrCoreFromIdeProtocol } from "./ide";
 import { ToCoreFromIdeProtocol, ToIdeFromCoreProtocol } from "./ideCore";
 import {
@@ -27,6 +28,7 @@ export type FromWebviewProtocol = ToIdeFromWebviewProtocol &
 // Core
 export type ToCoreProtocol = ToCoreFromIdeProtocol &
   ToCoreFromWebviewProtocol &
+  ToCoreFromIdeOrWebviewProtocol &
   ToWebviewOrCoreFromIdeProtocol;
 export type FromCoreProtocol = ToWebviewFromCoreProtocol &
   ToIdeFromCoreProtocol;

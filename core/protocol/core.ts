@@ -86,6 +86,7 @@ export type ToCoreFromIdeOrWebviewProtocol = {
   ];
   "config/addLocalWorkspaceBlock": [{ blockType: BlockType }, void];
   "config/newPromptFile": [undefined, void];
+  "config/deletePromptFile": [{ promptFile: string }, void];
   "config/newAssistantFile": [undefined, void];
   "config/ideSettingsUpdate": [IdeSettings, void];
   "config/getSerializedProfileInfo": [
@@ -152,6 +153,7 @@ export type ToCoreFromIdeOrWebviewProtocol = {
   ];
   "mcp/startAuthentication": [MCPServerStatus, void];
   "mcp/removeAuthentication": [MCPServerStatus, void];
+  "mcp/toggleServer": [{ id: string }, void];
 
   "context/getSymbolsForFiles": [{ uris: string[] }, FileSymbolMap];
   "context/loadSubmenuItems": [{ title: string }, ContextSubmenuItem[]];

@@ -35,17 +35,13 @@ export function useOnboardingCard(): UseOnboardingCard {
   if (onboardingCard.show) {
     show = true;
   } else {
-    show = onboardingStatus !== "Completed" && !hasDismissedOnboardingCard;
+    show = false; // 기업용 폐쇄망 환경에서는 OnboardingCard 비활성화
+    // show = onboardingStatus !== "Completed" && !hasDismissedOnboardingCard;
   }
 
   async function open(tab?: OnboardingModes) {
-    navigate("/");
-    dispatch(
-      setOnboardingCard({
-        show: true,
-        activeTab: tab ?? OnboardingModes.API_KEY,
-      }),
-    );
+    // 기업용 폐쇄망 환경: OnboardingCard 완전히 비활성화
+    return;
   }
 
   function close(isDialog = false) {
@@ -58,7 +54,8 @@ export function useOnboardingCard(): UseOnboardingCard {
   }
 
   function setActiveTab(tab: OnboardingModes) {
-    dispatch(setOnboardingCard({ show: true, activeTab: tab }));
+    // 기업용 폐쇄망 환경: OnboardingCard 완전히 비활성화
+    return;
   }
 
   return {

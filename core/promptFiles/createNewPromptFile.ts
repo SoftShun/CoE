@@ -74,3 +74,34 @@ export async function createNewPromptFileV2(
   await ide.writeFile(promptFileUri, PROMPT_FILE);
   await ide.openFile(promptFileUri);
 }
+
+export async function deletePromptFile(
+  ide: IDE,
+  promptFile: string,
+): Promise<void> {
+  if (!promptFile) {
+    throw new Error("Prompt file path is required");
+  }
+
+  if (promptFile.startsWith("builtin:")) {
+    throw new Error("Cannot delete built-in prompt files");
+  }
+
+  // Convert file:// URI to file path if needed
+  let filePath = promptFile;
+  if (promptFile.startsWith("file://")) {
+    // Remove file:// prefix and decode URI components
+    filePath = decodeURIComponent(promptFile.replace(/^file:\/\//, ""));
+    // On Windows, file:///C:/... becomes /C:/..., so we need to remove the leading /
+    if (process.platform === "win32" && /^\/[a-zA-Z]:/.test(filePath)) {
+      filePath = filePath.substring(1);
+    }
+  }
+
+  const fileExists = await ide.fileExists(filePath);
+  if (!fileExists) {
+    throw new Error(`Prompt file not found: ${filePath}`);
+  }
+
+  await ide.deleteFile(filePath);
+}

@@ -144,6 +144,16 @@ class VsCodeIde implements IDE {
     });
   }
 
+  async showConfirmDialog(message: string, title?: string): Promise<boolean> {
+    const result = await vscode.window.showWarningMessage(
+      message,
+      { modal: true, detail: title },
+      "확인",
+      "취소"
+    );
+    return result === "확인";
+  }
+
   showToast: IDE["showToast"] = async (...params) => {
     const [type, message, ...otherParams] = params;
     const { showErrorMessage, showWarningMessage, showInformationMessage } =
@@ -298,6 +308,10 @@ class VsCodeIde implements IDE {
       vscode.Uri.parse(fileUri),
       Buffer.from(contents),
     );
+  }
+
+  async deleteFile(fileUri: string): Promise<void> {
+    await vscode.workspace.fs.delete(vscode.Uri.parse(fileUri));
   }
 
   async showVirtualFile(title: string, contents: string): Promise<void> {

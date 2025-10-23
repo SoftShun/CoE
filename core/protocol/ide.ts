@@ -25,6 +25,7 @@ export type ToIdeFromWebviewOrCoreProtocol = {
   getIdeInfo: [undefined, IdeInfo];
   getWorkspaceDirs: [undefined, string[]];
   writeFile: [{ path: string; contents: string }, void];
+  deleteFile: [{ path: string }, void];
   showVirtualFile: [{ name: string; content: string }, void];
   openFile: [{ path: string }, void];
   openUrl: [string, void];
@@ -77,6 +78,7 @@ export type ToIdeFromWebviewOrCoreProtocol = {
     Parameters<IDE["showToast"]>,
     Awaited<ReturnType<IDE["showToast"]>>,
   ];
+  showConfirmDialog: [{ message: string; title?: string }, boolean];
   getGitRootPath: [{ dir: string }, string | undefined];
   listDir: [{ dir: string }, [string, FileType][]];
   getFileStats: [{ files: string[] }, FileStatsMap];

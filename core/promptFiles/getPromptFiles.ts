@@ -96,11 +96,23 @@ export async function getPromptFilesFromDir(
       source: "get dir prompt files",
     });
     const promptFilePaths = uris.filter((p) => p.endsWith(".prompt"));
-    const results = promptFilePaths.map(async (uri) => {
-      const content = await ide.readFile(uri); // make a try catch
-      return { path: uri, content };
-    });
-    return Promise.all(results);
+    const results = await Promise.allSettled(
+      promptFilePaths.map(async (uri) => {
+        try {
+          const content = await ide.readFile(uri);
+          return { path: uri, content };
+        } catch (error) {
+          // File may have been deleted between walkDir and readFile
+          console.warn(`Failed to read prompt file ${uri}:`, error);
+          return null;
+        }
+      }),
+    );
+
+    // Filter out failed reads (deleted files)
+    return results
+      .filter((result) => result.status === "fulfilled" && result.value !== null)
+      .map((result) => (result as PromiseFulfilledResult<{ path: string; content: string }>).value);
   } catch (e) {
     console.error(e);
     return [];
@@ -140,13 +152,7 @@ export async function getAllPromptFiles(
     content: INIT_PROMPT_CONTENT,
   });
 
-  return await Promise.all(
-    promptFiles.map(async (file) => {
-      if (file.path.startsWith("builtin:")) {
-        return file;
-      }
-      const content = await ide.readFile(file.path);
-      return { path: file.path, content };
-    }),
-  );
+  // All files already have content loaded from getPromptFilesFromDir() and readAllGlobalPromptFiles()
+  // No need to read again - just return them
+  return promptFiles;
 }

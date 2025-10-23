@@ -20,7 +20,7 @@ import DocsService from "./indexing/docs/DocsService";
 import { countTokens } from "./llm/countTokens";
 import Ollama from "./llm/llms/Ollama";
 import { EditAggregator } from "./nextEdit/context/aggregateEdits";
-import { createNewPromptFileV2 } from "./promptFiles/createNewPromptFile";
+import { createNewPromptFileV2, deletePromptFile } from "./promptFiles/createNewPromptFile";
 import { callTool } from "./tools/callTool";
 import { ChatDescriber } from "./util/chatDescriber";
 import { compactConversation } from "./util/conversationCompaction";
@@ -353,6 +353,16 @@ export class Core {
       await this.configHandler.reloadConfig(
         "Prompt file created (config/newPromptFile message)",
       );
+    });
+
+    on("config/deletePromptFile", async (msg) => {
+      console.log("[Core] deletePromptFile handler called:", msg.data.promptFile);
+      await deletePromptFile(this.ide, msg.data.promptFile);
+      console.log("[Core] File deleted, reloading config");
+      await this.configHandler.reloadConfig(
+        "Prompt file deleted (config/deletePromptFile message)",
+      );
+      console.log("[Core] Config reloaded after delete");
     });
 
     on("config/newAssistantFile", async (msg) => {
@@ -816,6 +826,15 @@ export class Core {
           );
           await this.configHandler.reloadConfig("Rules file created");
         }
+
+        // If it's a prompt file being created, we want to reload config so it shows up in the list
+        const hasPromptFiles = data.uris.some((uri) => uri.endsWith(".prompt"));
+        if (hasPromptFiles) {
+          console.log("[Core] Prompt file created, refreshing config:", data.uris.filter((uri) => uri.endsWith(".prompt")));
+          await this.configHandler.refreshAll("Prompt file created");
+          console.log("[Core] Config refreshed after prompt file creation");
+        }
+
         // If it's a local assistant being created, we want to reload all assistants so it shows up in the list
         let localAssistantCreated = false;
         for (const uri of data.uris) {

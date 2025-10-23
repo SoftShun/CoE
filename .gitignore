@@ -162,8 +162,10 @@ extensions/intellij/.idea/**
 
 extensions/intellij/bin
 extensions/.continue-debug/
+extensions/.axcode-debug/
 
 *.vsix
+extensions/vscode/build/*.vsix
 
 # intellij module library files
 *.iml
@@ -172,3 +174,47 @@ extensions/.continue-debug/
 **/.continue/assistants/
 **/.continue/agents/
 keys
+
+# ===== 사용자별 설정 파일 =====
+# Continue 개인 설정
+.continue/config.yaml
+.continue/config.json
+
+# MCP 서버 설정 (폴더는 tracked, yaml 파일만 ignore)
+.continue/mcpServers/*.yaml
+
+# Claude 개인 설정
+.claude/
+!.claude/lint-check.sh
+
+# ===== 런타임 데이터 =====
+# SQLite 데이터베이스
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# Continue 런타임 데이터
+.continue/dev_data/
+.continue/sessions/
+.continue/index/
+
+# ===== 운영체제/IDE 임시 파일 =====
+# macOS
+**/.DS_Store
+
+# TypeScript/빌드
+*.tsbuildinfo
+.turbo/
+
+# ===== 임시 파일 =====
+# 테스트/디버그 스크립트
+test-*.sh
+debug-*.js
+temp-*.py
+
+# Claude 작업 문서
+claudedocs/
+
+# Continue 임시 프롬프트
+.continue/prompts/new-prompt*.yaml

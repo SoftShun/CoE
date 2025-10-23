@@ -5,13 +5,13 @@ import {
   EllipsisHorizontalIcon,
   ExclamationTriangleIcon,
   PencilIcon,
-  Squares2X2Icon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { ReactNode, useContext, useEffect, useState } from "react";
+import { MCPIcon } from "../../../svg/MCPIcon";
 import { vscBadgeForeground } from "../../..";
 import { IdeMessengerContext } from "../../../../context/IdeMessenger";
-import { useAppSelector } from "../../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import FreeTrialButton from "../../../FreeTrialButton";
 import { ToolTip } from "../../../gui/Tooltip";
 import { useFontSize } from "../../../ui/font";
@@ -62,7 +62,7 @@ const sections: Section[] = [
     id: "mcp",
     title: "MCP",
     tooltip: <McpSectionTooltip />,
-    icon: Squares2X2Icon,
+    icon: MCPIcon,
   },
   {
     id: "error",
@@ -144,6 +144,7 @@ export function BlockSettingsTopToolbar() {
     setSelectedSection,
   } = useLump();
 
+  const dispatch = useAppDispatch();
   const configError = useAppSelector((store) => store.config.configError);
   const config = useAppSelector((state) => state.config.config);
   const ideMessenger = useContext(IdeMessengerContext);
@@ -217,11 +218,11 @@ export function BlockSettingsTopToolbar() {
                   tooltip={section.tooltip}
                   title={section.title}
                   isSelected={selectedSection === section.id}
-                  onClick={() =>
+                  onClick={() => {
                     setSelectedSection(
                       selectedSection === section.id ? null : section.id,
-                    )
-                  }
+                    );
+                  }}
                 />
               ))}
             </div>

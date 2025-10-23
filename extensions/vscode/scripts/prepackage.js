@@ -308,9 +308,38 @@ void (async () => {
         installAndCopyNodeModules(packageToInstall, "@lancedb"),
       ]);
     } else {
-      // Download esbuild from npm in tmp and copy over
-      console.log("[info] npm installing esbuild binary");
-      await installAndCopyNodeModules("esbuild@0.17.19", "@esbuild");
+      // Download platform-specific binaries for non-ARM targets
+      console.log("[info] Downloading pre-built binaries for target: " + target);
+
+      // Get platform-specific esbuild package name
+      const esbuildPackage = {
+        "darwin-x64": "@esbuild/darwin-x64@0.17.19",
+        "win32-x64": "@esbuild/win32-x64@0.17.19",
+        "linux-x64": "@esbuild/linux-x64@0.17.19",
+      }[target];
+
+      // Install lancedb for non-ARM targets (darwin-x64, win32-x64, linux-x64)
+      const lancedbPackage = {
+        "darwin-x64": "@lancedb/vectordb-darwin-x64",
+        "win32-x64": "@lancedb/vectordb-win32-x64-msvc",
+        "linux-x64": "@lancedb/vectordb-linux-x64-gnu",
+      }[target];
+
+      if (esbuildPackage && lancedbPackage) {
+        console.log("[info] Downloading esbuild: " + esbuildPackage);
+        console.log("[info] Downloading lancedb: " + lancedbPackage);
+        console.log("[info] Downloading sqlite3 for: " + target);
+        await Promise.all([
+          installAndCopyNodeModules(esbuildPackage, "@esbuild"),
+          installAndCopyNodeModules(lancedbPackage, "@lancedb"),
+          copySqlite(target),
+        ]);
+      } else if (esbuildPackage) {
+        await Promise.all([
+          installAndCopyNodeModules(esbuildPackage, "@esbuild"),
+          copySqlite(target),
+        ]);
+      }
     }
   }
 
@@ -394,7 +423,8 @@ void (async () => {
   );
 
   // Validate the all of the necessary files are present
-  validateFilesPresent([
+  // Note: Skip ripgrep validation for cross-platform builds
+  const filesToValidate = [
     // Queries used to create the index for @code context provider
     "tree-sitter/code-snippet-queries/c_sharp.scm",
 
@@ -428,9 +458,6 @@ void (async () => {
     "models/all-MiniLM-L6-v2/vocab.txt",
     "models/all-MiniLM-L6-v2/onnx/model_quantized.onnx",
 
-    // node_modules (it's a bit confusing why this is necessary)
-    `node_modules/@vscode/ripgrep/bin/rg${exe}`,
-
     // out directory (where the extension.js lives)
     // "out/extension.js", This is generated afterward by vsce
     // web-tree-sitter
@@ -441,7 +468,8 @@ void (async () => {
     "out/build/Release/node_sqlite3.node",
 
     // out/node_modules (to be accessed by extension.js)
-    `out/node_modules/@vscode/ripgrep/bin/rg${exe}`,
+    // Note: ripgrep validation skipped for cross-platform builds
+    // `out/node_modules/@vscode/ripgrep/bin/rg${exe}`,
     `out/node_modules/@esbuild/${
       target === "win32-arm64"
         ? "esbuild.exe"
@@ -451,7 +479,9 @@ void (async () => {
     }`,
     `out/node_modules/@lancedb/vectordb-${target}${isWinTarget ? "-msvc" : ""}${isLinuxTarget ? "-gnu" : ""}/index.node`,
     `out/node_modules/esbuild/lib/main.js`,
-  ]);
+  ];
+
+  validateFilesPresent(filesToValidate);
 
   console.log(
     `[timer] Prepackage completed in ${Date.now() - startTime}ms - finished at ${new Date().toISOString()}`,

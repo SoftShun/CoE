@@ -249,19 +249,29 @@ export function TipTapEditor(props: TipTapEditorProps) {
           onAddContextItem={() => insertCharacterWithWhitespace("@")}
           onEnter={onEnterRef.current}
           onImageFileSelected={(file) => {
+            console.log("🖼️ onImageFileSelected called with file:", file.name);
             void handleImageFile(ideMessenger, file).then((result) => {
+              console.log("🖼️ handleImageFile result:", result);
               if (!editor) {
+                console.error("❌ Editor is null!");
                 return;
               }
               if (result) {
                 const [_, dataUrl] = result;
+                console.log("🖼️ DataURL generated:", dataUrl.substring(0, 50) + "...");
                 const { schema } = editor.state;
                 const node = schema.nodes.image.create({ src: dataUrl });
-                editor.commands.command(({ tr }) => {
-                  tr.insert(0, node);
-                  return true;
-                });
+                console.log("🖼️ Image node created:", node);
+
+                // 드래그앤드롭과 동일한 방식으로 변경
+                const tr = editor.state.tr.insert(0, node);
+                editor.view.dispatch(tr);
+                console.log("✅ Image inserted successfully!");
+              } else {
+                console.error("❌ handleImageFile returned undefined/null");
               }
+            }).catch(error => {
+              console.error("❌ Error in handleImageFile:", error);
             });
           }}
           disabled={isStreaming}

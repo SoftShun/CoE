@@ -357,6 +357,9 @@ export class VsCodeMessenger {
     this.onWebviewOrCore("showToast", (msg) => {
       this.ide.showToast(...msg.data);
     });
+    this.onWebviewOrCore("showConfirmDialog", async (msg) => {
+      return await this.ide.showConfirmDialog(msg.data.message, msg.data.title);
+    });
     this.onWebviewOrCore("getControlPlaneSessionInfo", async (msg) => {
       return getControlPlaneSessionInfo(
         msg.data.silent,
