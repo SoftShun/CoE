@@ -218,3 +218,8 @@ claudedocs/
 
 # Continue 임시 프롬프트
 .continue/prompts/new-prompt*.yaml
+
+memorybank/
+
+CLAUDE.md
+.mcp.json

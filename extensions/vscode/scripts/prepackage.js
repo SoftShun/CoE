@@ -96,36 +96,42 @@ void (async () => {
   );
 
   const indexHtmlPath = path.join(intellijExtensionWebviewPath, "index.html");
-  fs.copyFileSync(indexHtmlPath, "tmp_index.html");
-  rimrafSync(intellijExtensionWebviewPath);
-  fs.mkdirSync(intellijExtensionWebviewPath, { recursive: true });
 
-  const jetbrainsCopyStart = Date.now();
-  console.log(`[timer] Starting JetBrains copy at ${new Date().toISOString()}`);
-  await new Promise((resolve, reject) => {
-    ncp("dist", intellijExtensionWebviewPath, (error) => {
-      if (error) {
-        console.warn(
-          "[error] Error copying React app build to JetBrains extension: ",
-          error,
-        );
-        reject(error);
-      }
-      resolve();
-    });
-  });
-  console.log(
-    `[timer] JetBrains copy completed in ${Date.now() - jetbrainsCopyStart}ms`,
-  );
-
-  // Put back index.html
+  // Only copy to JetBrains if webview is initialized (skip on first build for VSCode-only projects)
   if (fs.existsSync(indexHtmlPath)) {
-    rimrafSync(indexHtmlPath);
-  }
-  fs.copyFileSync("tmp_index.html", indexHtmlPath);
-  fs.unlinkSync("tmp_index.html");
+    fs.copyFileSync(indexHtmlPath, "tmp_index.html");
+    rimrafSync(intellijExtensionWebviewPath);
+    fs.mkdirSync(intellijExtensionWebviewPath, { recursive: true });
 
-  console.log("[info] Copied gui build to JetBrains extension");
+    const jetbrainsCopyStart = Date.now();
+    console.log(`[timer] Starting JetBrains copy at ${new Date().toISOString()}`);
+    await new Promise((resolve, reject) => {
+      ncp("dist", intellijExtensionWebviewPath, (error) => {
+        if (error) {
+          console.warn(
+            "[error] Error copying React app build to JetBrains extension: ",
+            error,
+          );
+          reject(error);
+        }
+        resolve();
+      });
+    });
+    console.log(
+      `[timer] JetBrains copy completed in ${Date.now() - jetbrainsCopyStart}ms`,
+    );
+
+    // Put back index.html
+    if (fs.existsSync(indexHtmlPath)) {
+      rimrafSync(indexHtmlPath);
+    }
+    fs.copyFileSync("tmp_index.html", indexHtmlPath);
+    fs.unlinkSync("tmp_index.html");
+
+    console.log("[info] Copied gui build to JetBrains extension");
+  } else {
+    console.log("[info] Skipping JetBrains copy - webview not initialized (VSCode-only build)");
+  }
 
   // Then copy over the dist folder to the VSCode extension //
   const vscodeGuiPath = path.join("../extensions/vscode/gui");
