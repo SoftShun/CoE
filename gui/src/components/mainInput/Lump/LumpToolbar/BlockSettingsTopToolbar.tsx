@@ -1,7 +1,6 @@
 import {
   ChatBubbleLeftIcon,
   ChevronLeftIcon,
-  CubeIcon,
   EllipsisHorizontalIcon,
   ExclamationTriangleIcon,
   PencilIcon,
@@ -44,7 +43,6 @@ interface Section {
 }
 
 const sections: Section[] = [
-  { id: "models", title: "Models", tooltip: "Models", icon: CubeIcon },
   { id: "rules", title: "Rules", tooltip: "Rules", icon: PencilIcon },
   {
     id: "prompts",
