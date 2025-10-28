@@ -40,8 +40,8 @@ class RagContextProvider extends BaseContextProvider {
         },
         body: JSON.stringify({
           query: extras.fullInput, // 사용자의 전체 입력을 검색 쿼리로 사용
-          group: groupName, // 선택된 그룹명
-          maxResults: this.options?.maxResults ?? 10,
+          group_name: groupName, // 선택된 그룹명 (Swagger API 스펙: group_name)
+          k: this.options?.maxResults ?? 10, // 결과 개수 (Swagger API 스펙: k)
         }),
         signal: AbortSignal.timeout(10000), // 10초 타임아웃
       });
