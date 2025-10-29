@@ -172,7 +172,7 @@ export class VsCodeExtension {
     // Sidebar
     context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
-        "axcode.axcodeGUIView",
+        "axcode.guiView",
         this.sidebar,
         {
           webviewOptions: { retainContextWhenHidden: true },
@@ -353,7 +353,7 @@ export class VsCodeExtension {
 
     context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
-        "axcode.axcodeConsoleView",
+        "axcode.consoleView",
         this.consoleView,
       ),
     );
