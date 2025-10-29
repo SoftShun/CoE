@@ -8,6 +8,7 @@ import useUpdatingRef from "../../../hooks/useUpdatingRef";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { selectSelectedChatModel } from "../../../redux/slices/configSlice";
 import InputToolbar, { ToolbarOptions } from "../InputToolbar";
+import { useLump } from "../Lump/LumpContext";
 import { ComboBoxItem } from "../types";
 import { DragOverlay } from "./components/DragOverlay";
 import { InputBoxDiv } from "./components/StyledComponents";
@@ -41,6 +42,7 @@ export const TIPPY_DIV_ID = "tippy-js-div";
 export function TipTapEditor(props: TipTapEditorProps) {
   const dispatch = useAppDispatch();
   const mainEditorContext = useMainEditor();
+  const { hideLump } = useLump();
 
   const ideMessenger = useContext(IdeMessengerContext);
   const isOSREnabled = useIsOSREnabled();
@@ -171,7 +173,9 @@ export function TipTapEditor(props: TipTapEditorProps) {
   const handleFocus = useCallback(() => {
     cancelBlurTimeout();
     setShouldHideToolbar(false);
-  }, [cancelBlurTimeout]);
+    // Close the Lump (MCP UI, etc.) when input is focused
+    hideLump();
+  }, [cancelBlurTimeout, hideLump]);
 
   return (
     <InputBoxDiv

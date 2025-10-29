@@ -1,73 +1,31 @@
-import {
-  ArrowPathIcon,
-  ArrowRightEndOnRectangleIcon,
-  ArrowRightStartOnRectangleIcon,
-  PlusIcon,
-} from "@heroicons/react/24/outline";
-import { AuthType, isOnPremSession } from "core/control-plane/AuthTypes";
-import { useContext, useEffect, useRef } from "react";
-import { useAuth } from "../../context/Auth";
-import { IdeMessengerContext } from "../../context/IdeMessenger";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import {
-  selectCurrentOrg,
-  setSelectedProfile,
-} from "../../redux/slices/profilesSlice";
-import { getMetaKeyLabel, isMetaEquivalentKeyPressed } from "../../util";
-import { cn } from "../../util/cn";
-import { ToolTip } from "../gui/Tooltip";
-import {
-  Listbox,
-  ListboxOption,
-  ListboxOptions,
-  Transition,
-  useFontSize,
-} from "../ui";
-import { AssistantOptions } from "./AssistantOptions";
-import { ScopeSelect } from "./ScopeSelect";
+import { useEffect, useState } from "react";
+import { AdjustmentsHorizontalIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { fontSize, getMetaKeyLabel, isMetaEquivalentKeyPressed } from "../../util";
+import { Listbox, ListboxOption, ListboxOptions, Transition, useFontSize } from "../ui";
 import { SelectedAssistantButton } from "./SelectedAssistantButton";
 
+type Mode = "Agent" | "Custom";
+
+// Infinity icon component for Agent mode
+function InfinityIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 0 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z" />
+    </svg>
+  );
+}
+
 export function AssistantAndOrgListbox() {
-  const dispatch = useAppDispatch();
-  const listboxRef = useRef<HTMLDivElement>(null);
-  const currentOrg = useAppSelector(selectCurrentOrg);
-  const ideMessenger = useContext(IdeMessengerContext);
-  const {
-    profiles,
-    selectedProfile,
-    session,
-    login,
-    logout,
-    organizations,
-    refreshProfiles,
-  } = useAuth();
-  const configLoading = useAppSelector((store) => store.config.loading);
+  const [currentMode, setCurrentMode] = useState<Mode>("Agent");
   const tinyFont = useFontSize(-4);
-  const shouldRenderOrgInfo =
-    session && organizations.length > 1 && !isOnPremSession(session);
-
-  function close() {
-    // Close the listbox by clicking outside or programmatically
-    const event = new KeyboardEvent("keydown", { key: "Escape" });
-    document.dispatchEvent(event);
-  }
-
-  function onNewAssistant() {
-    if (session) {
-      void ideMessenger.request("controlPlane/openUrl", {
-        path: "/new",
-        orgSlug: currentOrg?.slug,
-      });
-    } else {
-      void ideMessenger.request("config/newAssistantFile", undefined);
-    }
-    close();
-  }
-
-  function onLogout() {
-    logout();
-    close();
-  }
 
   useEffect(() => {
     let lastToggleTime = 0;
@@ -83,23 +41,8 @@ export function AssistantAndOrgListbox() {
 
         if (now - lastToggleTime >= DEBOUNCE_MS) {
           lastToggleTime = now;
-
-          const profileIds = profiles?.map((profile) => profile.id) ?? [];
-          // In case of 1 or 0 profiles just does nothing
-          if (profileIds.length < 2) {
-            return;
-          }
-          let nextId = profileIds[0];
-          if (selectedProfile) {
-            const curIndex = profileIds.indexOf(selectedProfile.id);
-            const nextIndex = (curIndex + 1) % profileIds.length;
-            nextId = profileIds[nextIndex];
-          }
-          // Optimistic update
-          dispatch(setSelectedProfile(nextId));
-          ideMessenger.post("didChangeSelectedProfile", {
-            id: nextId,
-          });
+          // Toggle between Agent and Custom
+          setCurrentMode((prev) => (prev === "Agent" ? "Custom" : "Agent"));
         }
       }
     };
@@ -108,100 +51,63 @@ export function AssistantAndOrgListbox() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [currentOrg, selectedProfile]);
+  }, []);
 
   return (
-    <Listbox>
-      <div className="relative" ref={listboxRef}>
-        <SelectedAssistantButton selectedProfile={selectedProfile} />
+    <Listbox value={currentMode} onChange={setCurrentMode}>
+      <div className="relative">
+        <SelectedAssistantButton mode={currentMode} />
         <Transition>
           <ListboxOptions
             className="-translate-x-1.5 pb-0"
             style={{ zIndex: 200 }}
           >
-            <div className="border-border border-x-0 border-t-0 border-solid px-2 py-2">
-              <div className="flex flex-col gap-2 pl-1">
-                {session ? (
-                  <span className="text-description-muted flex items-center justify-between gap-x-1">
-                    {session?.AUTH_TYPE !== AuthType.OnPrem &&
-                      session?.account.id}
-                    <ArrowRightStartOnRectangleIcon
-                      className="h-3 w-3 cursor-pointer hover:brightness-125"
-                      onClick={onLogout}
-                      data-tooltip-id="logout-tooltip"
-                    />
-                    <ToolTip id="logout-tooltip">Logout</ToolTip>
-                  </span>
-                ) : (
-                  <span
-                    className="text-description-muted flex cursor-pointer items-center justify-end gap-x-1 hover:brightness-125"
-                    onClick={() => login(false)}
-                  >
-                    Log In <ArrowRightEndOnRectangleIcon className="h-3 w-3" />
-                  </span>
+            {/* Mode Selection */}
+            <div className="flex flex-col py-1">
+              <ListboxOption
+                value="Agent"
+                className="flex select-none flex-row items-center justify-between px-2 py-1 background-transparent hover:bg-list-active hover:text-list-active-foreground cursor-pointer opacity-100"
+                style={{ fontSize: fontSize(-2) }}
+              >
+                {({ selected }) => (
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 flex-1">
+                      <InfinityIcon className="h-4 w-4 flex-shrink-0" />
+                      <span className="line-clamp-1">Agent</span>
+                    </div>
+                    {selected && (
+                      <CheckIcon className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+                    )}
+                  </div>
                 )}
-                {shouldRenderOrgInfo && (
-                  <>
-                    <label className="text-vsc-foreground font-semibold">
-                      Organization
-                    </label>
-                    <ScopeSelect />
-                  </>
+              </ListboxOption>
+              <ListboxOption
+                value="Custom"
+                className="flex select-none flex-row items-center justify-between px-2 py-1 background-transparent hover:bg-list-active hover:text-list-active-foreground cursor-pointer opacity-100"
+                style={{ fontSize: fontSize(-2) }}
+              >
+                {({ selected }) => (
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 flex-1">
+                      <AdjustmentsHorizontalIcon className="h-4 w-4 flex-shrink-0" />
+                      <span className="line-clamp-1">Custom</span>
+                    </div>
+                    {selected && (
+                      <CheckIcon className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+                    )}
+                  </div>
                 )}
-              </div>
+              </ListboxOption>
             </div>
 
-            <AssistantOptions
-              selectedProfileId={selectedProfile?.id}
-              onClose={close}
-            />
-
-            {/* Bottom Actions */}
-            <div className="border-border border-x-0 border-b-0 border-t border-solid">
-              <ListboxOption
-                value="new-assistant"
-                fontSizeModifier={-2}
-                className="border-border border-b px-2 py-1.5"
-                onClick={onNewAssistant}
-              >
-                <span
-                  className="text-description flex flex-row items-center"
-                  style={{ fontSize: tinyFont }}
-                >
-                  <PlusIcon className="mr-1 h-3 w-3" /> New Agent
-                </span>
-              </ListboxOption>
-
-              <ListboxOption
-                value="reload-assistant"
-                fontSizeModifier={-2}
-                className="border-border border-b px-2 py-1.5"
-                onClick={() =>
-                  refreshProfiles("Manual refresh from assistant list")
-                }
-              >
-                <span
-                  className="text-description flex flex-row items-center"
-                  style={{ fontSize: tinyFont }}
-                >
-                  <ArrowPathIcon
-                    className={cn(
-                      "mr-1 h-3 w-3",
-                      configLoading && "animate-spin-slow",
-                    )}
-                  />
-                  Reload agents
-                </span>
-              </ListboxOption>
-
-              <div
-                className="text-description border-border flex items-center justify-between gap-1.5 border-x-0 border-b-0 border-t border-solid px-2 py-2"
-                style={{ fontSize: tinyFont }}
-              >
-                <span className="block" style={{ fontSize: tinyFont - 1 }}>
-                  <code>{getMetaKeyLabel()} ⇧ '</code> to toggle agent
-                </span>
-              </div>
+            {/* Keyboard Shortcut Info */}
+            <div
+              className="text-description border-border flex items-center justify-between gap-1.5 border-x-0 border-b-0 border-t border-solid px-2 py-2"
+              style={{ fontSize: tinyFont }}
+            >
+              <span className="block" style={{ fontSize: tinyFont - 1 }}>
+                <code>{getMetaKeyLabel()} ⇧ '</code> to toggle mode
+              </span>
             </div>
           </ListboxOptions>
         </Transition>
