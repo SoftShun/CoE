@@ -153,8 +153,8 @@ class RagContextProvider extends BaseContextProvider {
         headers: {
           "Content-Type": "application/json",
         },
-        // 5초 타임아웃 설정
-        signal: AbortSignal.timeout(5000),
+        // 30초 타임아웃 설정 (RAG API 응답 시간이 매우 느림)
+        signal: AbortSignal.timeout(30000),
       });
 
       if (!response.ok) {

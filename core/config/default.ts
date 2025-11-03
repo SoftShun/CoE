@@ -10,25 +10,27 @@ export const defaultContextProvidersVsCode: NonNullable<
   { provider: "problems" },
   { provider: "folder" },
   { provider: "codebase" },
-  { provider: "rag", params: { apiBaseUrl: "http://10.34.238.61:8001/rag" } },
+  { provider: "rag", params: { apiBaseUrl: "http://greatcoe.cafe24.com:8080/rag" } },
 ];
 
 export const defaultModelVsCode: NonNullable<ConfigYaml["models"]>[number][] = [
   {
-    name: "GPT-4o Mini",
+    name: "CoEAgentV2",
     provider: "openai",
-    model: "gpt-4o-mini",
-    apiBase: "http://10.34.238.61:8000/v1",
-    apiKey: "",
+    model: "gpt-4o",
+    apiBase: "http://greatcoe.cafe24.com:8080/agent/v1",
+    apiKey: "dummy-api-key",
     capabilities: ["tool_use", "image_input"],
-    roles: ["chat", "edit", "apply"],
+    roles: ["chat", "edit", "apply", "autocomplete", "embed"],
+    toolExecution: "client",
+    clientSideTools: true,
     defaultCompletionOptions: {
       temperature: 0.7,
       maxTokens: 1500,
       stream: true,
     },
     requestOptions: {
-      extraBodyProperties: { context: "continue.dev", group_name: "MyTeamA" },
+      extraBodyProperties: { context: "continue.dev" },
     },
   },
 ];

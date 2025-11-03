@@ -221,5 +221,8 @@ claudedocs/
 
 memorybank/
 
+# test
 CLAUDE.md
 .mcp.json
+.playwright-mcp
+/_API-TEST
