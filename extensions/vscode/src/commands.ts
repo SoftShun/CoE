@@ -47,7 +47,7 @@ let fullScreenPanel: vscode.WebviewPanel | undefined;
 function getFullScreenTab() {
   const tabs = vscode.window.tabGroups.all.flatMap((tabGroup) => tabGroup.tabs);
   return tabs.find((tab) =>
-    (tab.input as any)?.viewType?.endsWith("axcode.axcodeGUIView"),
+    (tab.input as any)?.viewType?.endsWith("axcode.guiView"),
   );
 }
 
@@ -70,7 +70,7 @@ function focusGUI() {
     fullScreenPanel?.reveal();
   } else {
     // focus sidebar
-    vscode.commands.executeCommand("axcode.axcodeGUIView.focus");
+    vscode.commands.executeCommand("axcode.guiView.focus");
     // vscode.commands.executeCommand("workbench.action.focusAuxiliaryBar");
   }
 }
@@ -217,7 +217,7 @@ const getCommandsMap: (
 
       addCodeToContextFromRange(range, sidebar.webviewProtocol, prompt);
 
-      vscode.commands.executeCommand("axcode.axcodeGUIView.focus");
+      vscode.commands.executeCommand("axcode.guiView.focus");
     },
     // Passthrough for telemetry purposes
     "axcode.defaultQuickAction": async (args: QuickEditShowParams) => {
@@ -232,7 +232,7 @@ const getCommandsMap: (
 
       addCodeToContextFromRange(range, sidebar.webviewProtocol, prompt);
 
-      vscode.commands.executeCommand("axcode.axcodeGUIView.focus");
+      vscode.commands.executeCommand("axcode.guiView.focus");
     },
     "axcode.customQuickActionStreamInlineEdit": async (
       prompt: string,
@@ -393,7 +393,7 @@ const getCommandsMap: (
 
       const terminalContents = await ide.getTerminalContents();
 
-      vscode.commands.executeCommand("axcode.axcodeGUIView.focus");
+      vscode.commands.executeCommand("axcode.guiView.focus");
 
       sidebar.webviewProtocol?.request("userInput", {
         input: `I got the following error, can you please help explain how to fix it?\n\n${terminalContents.trim()}`,
@@ -409,7 +409,7 @@ const getCommandsMap: (
     "axcode.addModel": () => {
       captureCommandTelemetry("addModel");
 
-      vscode.commands.executeCommand("axcode.axcodeGUIView.focus");
+      vscode.commands.executeCommand("axcode.guiView.focus");
       sidebar.webviewProtocol?.request("addModel", undefined);
     },
     "axcode.newSession": () => {
@@ -455,7 +455,7 @@ const getCommandsMap: (
 
       // Create the full screen panel
       let panel = vscode.window.createWebviewPanel(
-        "axcode.axcodeGUIView",
+        "axcode.guiView",
         "AXCode",
         vscode.ViewColumn.One,
         {
@@ -510,7 +510,7 @@ const getCommandsMap: (
         throw new Error("No files were selected");
       }
 
-      vscode.commands.executeCommand("axcode.axcodeGUIView.focus");
+      vscode.commands.executeCommand("axcode.guiView.focus");
 
       for (const uri of uris) {
         // If it's a folder, add the entire folder contents recursively by using walkDir (to ignore ignored files)

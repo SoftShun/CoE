@@ -53,7 +53,7 @@
   "activationEvents": [
     "onUri",
     "onStartupFinished",
-    "onView:axcodeGUIView"
+    "onView:axcode.guiView"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -233,7 +233,7 @@
       },
       {
         "command": "axcode.forceAutocomplete",
-        "title": "AXCode: Force Autocomplete",
+        "title": "Force Autocomplete",
         "category": "AXCode"
       },
       {
@@ -354,17 +354,17 @@
       {
         "command": "axcode.forceNextEdit",
         "category": "AXCode",
-        "title": "AXCode: Force Next Edit"
+        "title": "Force Next Edit"
       },
       {
         "command": "axcode.acceptJump",
         "category": "AXCode",
-        "title": "AXCode: Accept Jump Suggestion"
+        "title": "Accept Jump Suggestion"
       },
       {
         "command": "axcode.rejectJump",
         "category": "AXCode",
-        "title": "AXCode: Reject Jump Suggestion"
+        "title": "Reject Jump Suggestion"
       },
       {
         "command": "axcode.generateRule",
@@ -575,39 +575,39 @@
         {
           "command": "axcode.newSession",
           "group": "navigation@1",
-          "when": "view == axcode.axcodeGUIView"
+          "when": "view == axcode.guiView"
         },
         {
           "command": "axcode.viewHistory",
           "group": "navigation@2",
-          "when": "view == axcode.axcodeGUIView"
+          "when": "view == axcode.guiView"
         },
         {
           "command": "axcode.toggleFullScreen",
           "group": "navigation@3",
-          "when": "view == axcode.axcodeGUIView"
+          "when": "view == axcode.guiView"
         },
         {
           "command": "axcode.openConfigPage",
           "group": "navigation@4",
-          "when": "view == axcode.axcodeGUIView"
+          "when": "view == axcode.guiView"
         },
         {
           "command": "axcode.clearConsole",
           "group": "navigation@1",
-          "when": "view == axcode.axcodeConsoleView"
+          "when": "view == axcode.consoleView"
         }
       ],
       "editor/title": [
         {
           "command": "axcode.newSession",
           "group": "navigation@1",
-          "when": "activeWebviewPanelId == axcode.axcodeGUIView"
+          "when": "activeWebviewPanelId == axcode.guiView"
         },
         {
           "command": "axcode.viewHistory",
           "group": "navigation@2",
-          "when": "activeWebviewPanelId == axcode.axcodeGUIView"
+          "when": "activeWebviewPanelId == axcode.guiView"
         }
       ],
       "terminal/context": [
@@ -637,7 +637,7 @@
       "axcode": [
         {
           "type": "webview",
-          "id": "axcode.axcodeGUIView",
+          "id": "axcode.guiView",
           "name": "AXCode",
           "icon": "media/sidebar-icon.png",
           "visibility": "visible"
@@ -646,7 +646,7 @@
       "axcodeConsole": [
         {
           "type": "webview",
-          "id": "axcode.axcodeConsoleView",
+          "id": "axcode.consoleView",
           "name": "AXCode Console",
           "icon": "$(window)",
           "visibility": "visible",
