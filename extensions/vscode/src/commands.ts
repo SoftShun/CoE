@@ -255,15 +255,7 @@ const getCommandsMap: (
       core.invoke("context/indexDocs", { reIndex: true });
     },
     "axcode.focusContinueInput": async () => {
-      const isContinueInputFocused = await sidebar.webviewProtocol.request(
-        "isContinueInputFocused",
-        undefined,
-        false,
-      );
-
-      // This is a temporary fix—sidebar.webviewProtocol.request is blocking
-      // when the GUI hasn't yet been setup and we should instead be
-      // immediately throwing an error, or returning a Result object
+      // sidebar가 준비되지 않은 경우 먼저 GUI를 열고 대기 (채팅창이 닫혀있을 때 필요)
       focusGUI();
       if (!sidebar.isReady) {
         const isReady = await waitForSidebarReady(sidebar, 5000, 100);
@@ -271,6 +263,12 @@ const getCommandsMap: (
           return;
         }
       }
+
+      const isContinueInputFocused = await sidebar.webviewProtocol.request(
+        "isContinueInputFocused",
+        undefined,
+        false,
+      );
 
       const historyLength = await sidebar.webviewProtocol.request(
         "getWebviewHistoryLength",
